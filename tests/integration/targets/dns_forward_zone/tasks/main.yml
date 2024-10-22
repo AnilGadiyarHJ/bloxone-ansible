@@ -39,9 +39,6 @@
           - forward_zone_info is not failed
           - forward_zone_info.objects | length == 0
 
-    - debug:
-        var: forward_zone
-
     - name: Create a Forward Zone
       infoblox.bloxone.dns_forward_zone:
         fqdn: "{{ fqdn }}"
@@ -59,7 +56,6 @@
           - forward_zone_info.objects | length == 1
           - forward_zone_info.objects[0].id == forward_zone.id
           - forward_zone_info.objects[0].fqdn == forward_zone.object.fqdn
-
 
     - name: Create a Forward Zone (idempotent)
       infoblox.bloxone.dns_forward_zone:
@@ -149,7 +145,7 @@
         filters:
           fqdn: "{{ fqdn }}"
       register: forward_zone_info
-    - name: Debug forward zone info         # Add the debug task here to inspect the returned object
+    - name: Debug forward zone info
       debug:
         var: forward_zone_info.objects[0]
     - assert:
