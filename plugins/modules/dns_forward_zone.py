@@ -371,7 +371,9 @@ class ForwardZoneModule(BloxoneAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -384,10 +386,14 @@ def main():
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
         disabled=dict(type="bool"),
-        external_forwarders=dict(type="list", elements="dict", options=dict(
-            address=dict(type="str"),
-            fqdn=dict(type="str"),
-        )),
+        external_forwarders=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                address=dict(type="str"),
+                fqdn=dict(type="str"),
+            ),
+        ),
         forward_only=dict(type="bool"),
         fqdn=dict(type="str"),
         hosts=dict(type="list", elements="str"),
