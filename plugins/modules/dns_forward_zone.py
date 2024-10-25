@@ -396,7 +396,6 @@ def main():
         parent=dict(type="str"),
         tags=dict(type="dict"),
         view=dict(type="str"),
-
     )
 
     module = ForwardZoneModule(
