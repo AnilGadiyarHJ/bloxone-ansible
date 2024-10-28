@@ -96,14 +96,12 @@ extends_documentation_fragment:
 EXAMPLES = r"""
   - name: Create a Forward Zone
     infoblox.bloxone.dns_forward_zone:
-      fqdn: "{{ fqdn }}"
-      view: "{{ _view.id }}"
+      fqdn: "example_zone."
       state: present
 
   - name: Create an Forward Zone with Additional Fields
     infoblox.bloxone.dns_forward_zone:
-      fqdn: "{{ fqdn }}"
-      view: "{{ _view.id }}"
+      fqdn: "example_zone."
       comment: "Example Forward Zone"
       disabled: true
       external_forwarders:
@@ -115,7 +113,7 @@ EXAMPLES = r"""
 
   - name: Delete the Zone
     infoblox.bloxone.dns_forward_zone:
-      name: "example_zone"
+      name: "example_zone."
       state: "absent"
 """  # noqa: E501
 

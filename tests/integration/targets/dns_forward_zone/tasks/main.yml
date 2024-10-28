@@ -13,8 +13,6 @@
     # Create a random Forward Zone FQDN to avoid conflicts
     - ansible.builtin.set_fact:
         fqdn: "fw-zone-{{ 999999 | random | string }}.com."
-        name: "test-view-{{ 999999 | random | string }}"
-
 
     - name: Create a Forward Zone (check mode)
       infoblox.bloxone.dns_forward_zone:
@@ -27,12 +25,7 @@
       infoblox.bloxone.dns_forward_zone_info:
         filters:
           fqdn: "{{ fqdn }}"
-          view: "{{ _view.id }}"
       register: forward_zone_info
-    - debug:
-        var: forward_zone  # Print all attributes of forward_zone
-    - debug:
-        msg: "{{ forward_zone }}"
     - assert:
         that:
           - forward_zone is changed
@@ -125,7 +118,6 @@
       infoblox.bloxone.dns_forward_zone_info:
         filters:
           fqdn: "{{ fqdn }}"
-          view: "{{ _view.id }}"
       register: forward_zone_info
     - assert:
         that:
@@ -138,126 +130,106 @@
         fqdn: "{{ fqdn }}"
         tags:
           location: "site-1"
-          state: present
       register: forward_zone
-    - name: Get Information about the Forward Zone with Tags tag1
+    - name: Get Information about the Forward Zone with Tags
       infoblox.bloxone.dns_forward_zone_info:
         filters:
           fqdn: "{{ fqdn }}"
       register: forward_zone_info
-    - name: Debug forward zone info
-      debug:
-        var: forward_zone_info.objects[0]
     - assert:
         that:
           - forward_zone_info is not failed
           - forward_zone_info.objects | length == 1
           - forward_zone_info.objects[0].tags.location == "site-1"
 
-    - name: Test Forward Zone Resource with Comment
-      block:
-        - name: Create and Read Forward Zone with Comment
-          infoblox.bloxone.dns_forward_zone:
-            fqdn: "{{ fqdn }}"
-            comment: "test comment"
-            state: present
-          register: forward_zone
-        - name: Get Information about the Forward Zone with Comment
-          infoblox.bloxone.dns_forward_zone_info:
-            filters:
-              fqdn: "{{ fqdn }}"
-          register: forward_zone
-        - assert:
-            that:
-              - forward_zone is not failed
-              - forward_zone.objects | length == 1
-              - forward_zone.objects[0].comment == "test comment"
+    - name: Create and Read Forward Zone with Comment
+      infoblox.bloxone.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        comment: "test comment"
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone with Comment
+      infoblox.bloxone.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+      register: forward_zone
+    - assert:
+        that:
+          - forward_zone is not failed
+          - forward_zone.objects | length == 1
+          - forward_zone.objects[0].comment == "test comment"
 
-    - name: Test Forward Zone Resource with Disabled
-      block:
-        - name: Create and Read Forward Zone with Disabled True
-          infoblox.bloxone.dns_forward_zone:
-            fqdn: "{{ fqdn }}"
-            disabled: true
-            state: present
-          register: forward_zone
-        - name: Get Information about the Forward Zone with Disabled True
-          infoblox.bloxone.dns_forward_zone_info:
-            filters:
-              fqdn: "{{ fqdn }}"
-          register: forward_zone_info
-        - assert:
-            that:
-              - forward_zone is not failed
-              - forward_zone_info.objects | length == 1
-              - forward_zone_info.objects[0].disabled == true
+    - name: Create and Read Forward Zone with Disabled
+      infoblox.bloxone.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        disabled: true
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone with Disabled
+      infoblox.bloxone.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].disabled == true
 
-    - name: Create and Read Forward Zone with External Forwarders Address
-      block:
-        - name: Create Forward Zone with External Forwarder Address
-          infoblox.bloxone.dns_forward_zone:
-            fqdn: "{{ fqdn }}"
-            external_forwarders:
-              - address: "192.168.10.10"
-            state: present
-          register: forward_zone
+    - name: Create Forward Zone with External Forwarders using Address only
+      infoblox.bloxone.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        external_forwarders:
+          - address: "192.168.10.10"
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone with External Forwarder Address
+      infoblox.bloxone.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].external_forwarders[0].address == "192.168.10.10"
 
-        - name: Get Information about the Forward Zone with External Forwarder Address
-          infoblox.bloxone.dns_forward_zone_info:
-            filters:
-              fqdn: "{{ fqdn }}"
-          register: forward_zone_info
+    - name: Create Forward Zone with External Forwarders using FQDN and Address
+      infoblox.bloxone.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        external_forwarders:
+          - address: "192.168.10.10"
+            fqdn: "tf-infoblox-test.com."
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone with External Forwarders
+      infoblox.bloxone.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].external_forwarders[0].address == "192.168.10.10"
+          - forward_zone_info.objects[0].external_forwarders[0].fqdn == "tf-infoblox-test.com."
 
-        - assert:
-            that:
-              - forward_zone is not failed
-              - forward_zone_info.objects | length == 1
-              - forward_zone_info.objects[0].external_forwarders[0].address == "192.168.10.10"
-
-    - name: Create and Read Forward Zone with External Forwarders FQDN
-      block:
-        - name: Create Forward Zone with External Forwarders FQDN
-          infoblox.bloxone.dns_forward_zone:
-            fqdn: "{{ fqdn }}"
-            external_forwarders:
-              - address: "192.168.10.10"
-                fqdn: "tf-infoblox-test.com."
-            state: present
-          register: forward_zone
-
-        - name: Get Information about the Forward Zone with External Forwarders FQDN
-          infoblox.bloxone.dns_forward_zone_info:
-            filters:
-              fqdn: "{{ fqdn }}"
-          register: forward_zone_info
-
-        - assert:
-            that:
-              - forward_zone is not failed
-              - forward_zone_info.objects | length == 1
-              - forward_zone_info.objects[0].external_forwarders[0].address == "192.168.10.10"
-              - forward_zone_info.objects[0].external_forwarders[0].fqdn == "tf-infoblox-test.com."
-
-    - name: Create and Read Forward Zone with Forward Only
-      block:
-        - name: Create Forward Zone with Forward Only False
-          infoblox.bloxone.dns_forward_zone:
-            fqdn: "{{ fqdn }}"
-            forward_only: false
-            state: present
-          register: forward_zone
-
-        - name: Get Information about the Forward Zone with Forward Only False
-          infoblox.bloxone.dns_forward_zone_info:
-            filters:
-              fqdn: "{{ fqdn }}"
-          register: forward_zone_info
-
-        - assert:
-            that:
-              - forward_zone is not failed
-              - forward_zone_info.objects | length == 1
-              - forward_zone_info.objects[0].forward_only == false
+    - name: Create Forward Zone with Forward Only
+      infoblox.bloxone.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        forward_only: false
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone with Forward Only
+      infoblox.bloxone.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].forward_only == false
 
   always:
     # Cleanup if the test fails
