@@ -85,7 +85,6 @@
         view: "{{ _view.id }}"
         state: absent
       register: forward_zone
-
     - name: Get Information about the Forward Zone
       infoblox.bloxone.dns_forward_zone_info:
         filters:
