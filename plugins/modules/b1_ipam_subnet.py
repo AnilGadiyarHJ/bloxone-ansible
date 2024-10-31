@@ -55,7 +55,7 @@ options:
     type: str
   dhcp_options:
     description:
-      - Configures the DHCP options associated with the subnet. Routers option supports first|last 
+      - Configures the DHCP options associated with the subnet. Routers option supports first|last
         as special command to assign IP based on subnet
     type: list
   tags:
