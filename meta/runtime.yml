@@ -61,16 +61,7 @@ plugin_routing:
           deprecation:
             removal_version: 3.0.0
             warning_text: Use infoblox.bloxone.dns_auth_zone instead.
-        b1_dns_auth_zone_gather:
+        b1_dns_zone_gather:
           deprecation:
             removal_version: 3.0.0
             warning_text: Use infoblox.bloxone.dns_auth_zone_info instead.
-
-        b1_dns_forward_zone:
-            deprecation:
-                removal_version: 3.0.0
-                warning_text: Use infoblox.bloxone.dns_forward_zone instead.
-        b1_dns_forward_zone_gather:
-           deprecation:
-                removal_version: 3.0.0
-                warning_text: Use infoblox.bloxone.dns_forward_zone_info instead.
