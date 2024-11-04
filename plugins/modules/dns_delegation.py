@@ -224,7 +224,10 @@ class DelegationModule(BloxoneAnsibleModule):
         if self.check_mode:
             return None
 
-        resp = DelegationApi(self.client).update(id=self.existing.id, body=self.payload)
+        update_body = self.payload
+        update_body = self.validate_readonly_on_update(self.existing, update_body, ["fqdn"])
+
+        resp = DelegationApi(self.client).update(id=self.existing.id, body=update_body)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
