@@ -9,10 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: ipam_subnet
-short_description: Manage Subnet
+module: ipam_address_block
+short_description: Manage AddressBlock
 description:
-    - Manage Subnet
+    - Manage AddressBlock
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -32,11 +32,11 @@ options:
         default: present
     address:
         description:
-            - "The address of the subnet in the form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
+            - "The address field in form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
         type: str
     asm_config:
         description:
-            - "The Automated Scope Management configuration for the subnet."
+            - "The Automated Scope Management configuration for the address block."
         type: dict
         suboptions:
             asm_threshold:
@@ -80,11 +80,11 @@ options:
                 type: str
     cidr:
         description:
-            - "The CIDR of the subnet. This is required if I(address) does not include CIDR."
+            - "The CIDR of the address block. This is required, if I(address) does not specify it in its input."
         type: int
     comment:
         description:
-            - "The description for the subnet. May contain 0 to 1024 characters. Can include UTF-8."
+            - "The description for the address block. May contain 0 to 1024 characters. Can include UTF-8."
         type: str
     ddns_client_update:
         description:
@@ -125,7 +125,7 @@ options:
         type: str
     ddns_send_updates:
         description:
-            - "Determines if DDNS updates are enabled at the subnet level. Defaults to I(true)."
+            - "Determines if DDNS updates are enabled at the address block level. Defaults to I(true)."
         type: bool
     ddns_ttl_percent:
         description:
@@ -144,7 +144,7 @@ options:
         type: bool
     dhcp_config:
         description:
-            - "The DHCP configuration of the subnet that controls how leases are issued."
+            - "The shared DHCP configuration that controls how leases are issued for the address block."
         type: dict
         suboptions:
             abandoned_reclaim_time:
@@ -206,13 +206,9 @@ options:
                 description:
                     - "The lease duration in seconds for IPV6 clients."
                 type: int
-    dhcp_host:
-        description:
-            - "The resource identifier."
-        type: str
     dhcp_options:
         description:
-            - "The DHCP options of the subnet. This can either be a specific option or a group of options."
+            - "The list of DHCP options for the address block. May be either a specific option or a group of options."
         type: list
         elements: dict
         suboptions:
@@ -235,11 +231,6 @@ options:
                     - "* I(group)"
                     - "* I(option)"
                 type: str
-    disable_dhcp:
-        description:
-            - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
-            - "Defaults to I(false)."
-        type: bool
     header_option_filename:
         description:
             - "The configuration for header option filename field."
@@ -275,7 +266,7 @@ options:
         type: str
     inheritance_sources:
         description:
-            - "The DHCP inheritance configuration for the subnet."
+            - "The DHCP inheritance configuration for the address block."
         type: dict
         suboptions:
             asm_config:
@@ -717,31 +708,23 @@ options:
                         type: str
     name:
         description:
-            - "The name of the subnet. May contain 1 to 256 characters. Can include UTF-8."
+            - "The name of the address block. May contain 1 to 256 characters. Can include UTF-8."
         type: str
     parent:
         description:
             - "The resource identifier."
         type: str
-    rebind_time:
-        description:
-            - "The lease rebind time (T2) in seconds."
-        type: int
-    renew_time:
-        description:
-            - "The lease renew time (T1) in seconds."
-        type: int
     space:
         description:
             - "The resource identifier."
         type: str
     tags:
         description:
-            - "The tags for the subnet in JSON format."
+            - "The tags for the address block in JSON format."
         type: dict
     threshold:
         description:
-            - "The IP address utilization threshold settings for the subnet."
+            - "The IP address utilization thresholds for the address block."
         type: dict
         suboptions:
             enabled:
@@ -768,75 +751,86 @@ EXAMPLES = r"""
         state: "present"
       register: ip_space
 
-    - name: "Create a subnet"
-      infoblox.bloxone.ipam_subnet:
+    - name: "Create an address block"
+      infoblox.bloxone.ipam_address_block:
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
         state: "present"
 
-    - name: "Create a subnet with dhcp_config overridden"
-      infoblox.bloxone.ipam_subnet:
-        address: "10.0.0.0/24"
-        space: "{{ ip_space_id }}"
-        state: "present"
-        dhcp_config:
-            abandoned_reclaim_time: 3600
-        inheritance_sources:
-            dhcp_config:
-                lease_time:
-                    action: override
-
-                # The API currently requires all fields inside the inheritance config to be explicitly provided,
-                # or it fails with error 'The value of an inheritance action field is not valid'.
-                abandoned_reclaim_time:
-                    action: inherit
-                abandoned_reclaim_time_v6:
-                    action: inherit
-                allow_unknown:
-                      action: inherit
-                allow_unknown_v6:
-                    action: inherit
-                echo_client_id:
-                    action: inherit
-                filters:
-                    action: inherit
-                filters_v6:
-                    action: inherit
-                ignore_client_uid:
-                    action: inherit
-                ignore_list:
-                    action: inherit
-                lease_time_v6:
-                    action: inherit
-
-    - name: "Delete a subnet"
-      infoblox.bloxone.ipam_subnet:
-        address: "10.0.0.0"
-        cidr: "24"
+    - name: "Delete an Address Block"
+      infoblox.bloxone.ipam_address_block:
+        address: "10.0.0.0/16"
         space: "{{ ip_space.id }}"
         state: "absent"
+
+    - name: "Create an Address Block with separate cidr"
+      infoblox.bloxone.ipam_address_block:
+        address: "10.0.0.0"
+        cidr: 16
+        space: "{{ ip_space.id }}"
+        state: "present"
+
+    - name: "Create an Address Block with DHCP config overridden"
+      infoblox.bloxone.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ ip_space.id }}"
+        state: "present"
+        dhcp_config:
+          lease_time: 3600
+        inheritance_sources:
+          dhcp_config:
+            lease_time:
+              action: override
+            abandoned_reclaim_time:
+              action: inherit
+            abandoned_reclaim_time_v6:
+              action: inherit
+            allow_unknown:
+              action: inherit
+            allow_unknown_v6:
+              action: inherit
+            echo_client_id:
+              action: inherit
+            filters:
+              action: inherit
+            filters_v6:
+              action: inherit
+            ignore_client_uid:
+              action: inherit
+            ignore_list:
+              action: inherit
+            lease_time_v6:
+              action: inherit
+
+    - name: "Create an Address Block with tags"
+      infoblox.bloxone.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ ip_space.id }}"
+        state: "present"
+        tags:
+          location: "site-1"
 """
 
 RETURN = r"""
 id:
     description:
-        - ID of the Subnet object
+        - ID of the AddressBlock object
     type: str
     returned: Always
 item:
     description:
-        - Subnet object
+        - AddressBlock object
     type: complex
     returned: Always
     contains:
         address:
             description:
-                - "The address of the subnet in the form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
+                - "The address field in form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
             type: str
             returned: Always
         asm_config:
             description:
-                - "The Automated Scope Management configuration for the subnet."
+                - "The Automated Scope Management configuration for the address block."
             type: dict
             returned: Always
             contains:
@@ -891,17 +885,17 @@ item:
                     returned: Always
         asm_scope_flag:
             description:
-                - "Set to 1 to indicate that the subnet may run out of addresses."
+                - "Incremented by 1 if the IP address usage limits for automated scope management are exceeded for any subnets in the address block."
             type: int
             returned: Always
         cidr:
             description:
-                - "The CIDR of the subnet. This is required if I(address) does not include CIDR."
+                - "The CIDR of the address block. This is required, if I(address) does not specify it in its input."
             type: int
             returned: Always
         comment:
             description:
-                - "The description for the subnet. May contain 0 to 1024 characters. Can include UTF-8."
+                - "The description for the address block. May contain 0 to 1024 characters. Can include UTF-8."
             type: str
             returned: Always
         created_at:
@@ -953,7 +947,7 @@ item:
             returned: Always
         ddns_send_updates:
             description:
-                - "Determines if DDNS updates are enabled at the subnet level. Defaults to I(true)."
+                - "Determines if DDNS updates are enabled at the address block level. Defaults to I(true)."
             type: bool
             returned: Always
         ddns_ttl_percent:
@@ -976,7 +970,7 @@ item:
             returned: Always
         dhcp_config:
             description:
-                - "The DHCP configuration of the subnet that controls how leases are issued."
+                - "The shared DHCP configuration that controls how leases are issued for the address block."
             type: dict
             returned: Always
             contains:
@@ -1050,14 +1044,9 @@ item:
                         - "The lease duration in seconds for IPV6 clients."
                     type: int
                     returned: Always
-        dhcp_host:
-            description:
-                - "The resource identifier."
-            type: str
-            returned: Always
         dhcp_options:
             description:
-                - "The DHCP options of the subnet. This can either be a specific option or a group of options."
+                - "The list of DHCP options for the address block. May be either a specific option or a group of options."
             type: list
             returned: Always
             elements: dict
@@ -1087,7 +1076,7 @@ item:
                     returned: Always
         dhcp_utilization:
             description:
-                - "The utilization of IP addresses within the DHCP ranges of the subnet."
+                - "The utilization of IP addresses within the DHCP ranges of the address block."
             type: dict
             returned: Always
             contains:
@@ -1111,20 +1100,14 @@ item:
                         - "The percentage of used IP addresses relative to the total IP addresses available in the DHCP ranges in the scope of this object."
                     type: int
                     returned: Always
-        disable_dhcp:
-            description:
-                - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
-                - "Defaults to I(false)."
-            type: bool
-            returned: Always
         discovery_attrs:
             description:
-                - "The discovery attributes for this subnet in JSON format."
+                - "The discovery attributes for this address block in JSON format."
             type: dict
             returned: Always
         discovery_metadata:
             description:
-                - "The discovery metadata for this subnet in JSON format."
+                - "The discovery metadata for this address block in JSON format."
             type: dict
             returned: Always
         header_option_filename:
@@ -1167,28 +1150,6 @@ item:
                 - "The resource identifier."
             type: str
             returned: Always
-        inheritance_assigned_hosts:
-            description:
-                - "The list of the inheritance assigned hosts of the object."
-            type: list
-            returned: Always
-            elements: dict
-            contains:
-                display_name:
-                    description:
-                        - "The human-readable display name for the host referred to by I(ophid)."
-                    type: str
-                    returned: Always
-                host:
-                    description:
-                        - "The resource identifier."
-                    type: str
-                    returned: Always
-                ophid:
-                    description:
-                        - "The on-prem host ID."
-                    type: str
-                    returned: Always
         inheritance_parent:
             description:
                 - "The resource identifier."
@@ -1196,7 +1157,7 @@ item:
             returned: Always
         inheritance_sources:
             description:
-                - "The DHCP inheritance configuration for the subnet."
+                - "The DHCP inheritance configuration for the address block."
             type: dict
             returned: Always
             contains:
@@ -2275,7 +2236,7 @@ item:
                                     returned: Always
         name:
             description:
-                - "The name of the subnet. May contain 1 to 256 characters. Can include UTF-8."
+                - "The name of the address block. May contain 1 to 256 characters. Can include UTF-8."
             type: str
             returned: Always
         parent:
@@ -2285,18 +2246,8 @@ item:
             returned: Always
         protocol:
             description:
-                - "The type of protocol of the subnet (I(ip4) or I(ip6))."
+                - "The type of protocol of address block (I(ip4) or I(ip6))."
             type: str
-            returned: Always
-        rebind_time:
-            description:
-                - "The lease rebind time (T2) in seconds."
-            type: int
-            returned: Always
-        renew_time:
-            description:
-                - "The lease renew time (T1) in seconds."
-            type: int
             returned: Always
         space:
             description:
@@ -2305,12 +2256,12 @@ item:
             returned: Always
         tags:
             description:
-                - "The tags for the subnet in JSON format."
+                - "The tags for the address block in JSON format."
             type: dict
             returned: Always
         threshold:
             description:
-                - "The IP address utilization threshold settings for the subnet."
+                - "The IP address utilization thresholds for the address block."
             type: dict
             returned: Always
             contains:
@@ -2336,15 +2287,12 @@ item:
             returned: Always
         usage:
             description:
-                - "The usage is a combination of indicators, each tracking a specific associated use. Listed below are usage indicators with their meaning:"
-                - "* I(IPAM): Subnet is managed in BloxOne DDI."
-                - "* I(DHCP): Subnet is served by a DHCP Host."
-                - "* I(DISCOVERED): Subnet is discovered by some network discovery probe like Network Insight or NetMRI in NIOS."
+                - "The usage is a combination of indicators, each tracking a specific associated use. Listed below are usage indicators with their meaning: usage indicator        | description ---------------------- | -------------------------------- I(IPAM)                 |  AddressBlock is managed in BloxOne DDI. I(DISCOVERED)           |  AddressBlock is discovered by some network discovery probe like Network Insight or NetMRI in NIOS."
             type: list
             returned: Always
         utilization:
             description:
-                - "The IPV4 address utilization statistics of the subnet."
+                - "The IPV4 address utilization statistics for the address block."
             type: dict
             returned: Always
             contains:
@@ -2390,7 +2338,7 @@ item:
                     returned: Always
         utilization_v6:
             description:
-                - "The utilization of IPV6 addresses in the subnet."
+                - "The utilization of IPV6 addresses in the Address block."
             type: dict
             returned: Always
             contains:
@@ -2420,14 +2368,14 @@ from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import Bl
 
 try:
     from bloxone_client import ApiException, NotFoundException
-    from ipam import Subnet, SubnetApi
+    from ipam import AddressBlock, AddressBlockApi
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class SubnetModule(BloxoneAnsibleModule):
+class AddressBlockModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(SubnetModule, self).__init__(*args, **kwargs)
+        super(AddressBlockModule, self).__init__(*args, **kwargs)
 
         if "/" in self.params["address"]:
             self.params["address"], netmask = self.params["address"].split("/")
@@ -2435,7 +2383,7 @@ class SubnetModule(BloxoneAnsibleModule):
 
         exclude = ["state", "csp_url", "api_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
-        self._payload = Subnet.from_dict(self._payload_params)
+        self._payload = AddressBlock.from_dict(self._payload_params)
         self._existing = None
 
     @property
@@ -2464,7 +2412,7 @@ class SubnetModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = SubnetApi(self.client).read(self.params["id"], inherit="full")
+                resp = AddressBlockApi(self.client).read(self.params["id"], inherit="full")
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -2472,11 +2420,11 @@ class SubnetModule(BloxoneAnsibleModule):
                 raise e
         else:
             filter = f"address=='{self.params['address']}' and space=='{self.params['space']}' and cidr=={self.params['cidr']}"
-            resp = SubnetApi(self.client).list(filter=filter, inherit="full")
+            resp = AddressBlockApi(self.client).list(filter=filter, inherit="full")
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple Subnet: {resp.results}")
+                self.fail_json(msg=f"Found multiple AddressBlock: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -2484,7 +2432,7 @@ class SubnetModule(BloxoneAnsibleModule):
         if self.check_mode:
             return None
 
-        resp = SubnetApi(self.client).create(body=self.payload, inherit="full")
+        resp = AddressBlockApi(self.client).create(body=self.payload, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
@@ -2494,14 +2442,14 @@ class SubnetModule(BloxoneAnsibleModule):
         update_body = self.payload
         update_body = self.validate_readonly_on_update(self.existing, update_body, ["address", "space", "cidr"])
 
-        resp = SubnetApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
+        resp = AddressBlockApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
         if self.check_mode:
             return
 
-        SubnetApi(self.client).delete(self.existing.id)
+        AddressBlockApi(self.client).delete(self.existing.id)
 
     def run_command(self):
         result = dict(changed=False, object={}, id=None)
@@ -2514,16 +2462,16 @@ class SubnetModule(BloxoneAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "Subnet created"
+                result["msg"] = "AddressBlock created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "Subnet updated"
+                    result["msg"] = "AddressBlock updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "Subnet deleted"
+                result["msg"] = "AddressBlock deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -2597,7 +2545,6 @@ def main():
                 lease_time_v6=dict(type="int"),
             ),
         ),
-        dhcp_host=dict(type="str"),
         dhcp_options=dict(
             type="list",
             elements="dict",
@@ -2608,7 +2555,6 @@ def main():
                 type=dict(type="str"),
             ),
         ),
-        disable_dhcp=dict(type="bool"),
         header_option_filename=dict(type="str"),
         header_option_server_address=dict(type="str"),
         header_option_server_name=dict(type="str"),
@@ -2828,8 +2774,6 @@ def main():
         ),
         name=dict(type="str"),
         parent=dict(type="str"),
-        rebind_time=dict(type="int"),
-        renew_time=dict(type="int"),
         space=dict(type="str"),
         tags=dict(type="dict"),
         threshold=dict(
@@ -2842,7 +2786,7 @@ def main():
         ),
     )
 
-    module = SubnetModule(
+    module = AddressBlockModule(
         argument_spec=module_args,
         supports_check_mode=True,
         required_if=[("state", "present", ["address", "space"])],

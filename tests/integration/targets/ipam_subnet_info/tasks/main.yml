@@ -33,10 +33,12 @@
           - subnet_info.objects | length == 1
           - subnet_info.objects[0].name == subnet.object.name
 
-    - name: Get Subnet information by filters (address)
+    - name: Get Subnet information by filters
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
+          space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -45,8 +47,8 @@
 
     - name: Get Subnet information by filter query
       infoblox.bloxone.ipam_subnet_info:
-        filters_query: "address=='10.0.0.0/24'"
-        register: subnet_info
+        filter_query: "address=='10.0.0.0' and space=='{{ ip_space.id }}' and cidr==24"
+      register: subnet_info
     - assert:
         that:
           - subnet_info.objects | length == 1

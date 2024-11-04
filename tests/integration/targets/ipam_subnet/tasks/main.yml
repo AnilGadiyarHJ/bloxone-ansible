@@ -7,6 +7,7 @@
     # Create a random IP space name to avoid conflicts
     - ansible.builtin.set_fact:
         name: "test-ip-space-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
 
     # Basic tests for Subnet
     - name: "Create an IP space"
@@ -25,8 +26,9 @@
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -43,8 +45,9 @@
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -74,8 +77,9 @@
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -92,8 +96,9 @@
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -118,43 +123,46 @@
         space: "{{ ip_space.id }}"
         state: "present"
         asm_config:
-          asm_threshold: 80
-          forecast_period: 10
+          asm_threshold: 70
+          enable: true
+          enable_notification: true
+          forecast_period: 12
+          growth_factor: 40
+          growth_type: "count"
+          history: 40
+          min_total: 30
+          min_unused: 30
+          reenable_date: "2020-01-10T10:11:22Z"
         inheritance_sources:
           asm_config:
+            asm_enable_block:
+              action: inherit
+            asm_growth_block:
+              action: inherit
             asm_threshold:
               action: override
-            enable:
-              action: inherit
-            enable_notification:
-              action: inherit
             forecast_period:
               action: override
-            growth_factor:
-              action: inherit
-            growth_type:
-              action: inherit
             history:
-              action: inherit
+              action: override
             min_total:
-              action: inherit
+              action: override
             min_unused:
-              action: inherit
-            reenable_date:
-              action: inherit
+              action: override
       register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
-        register: subnet_info
+          cidr: 24
+      register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].asm_config.asm_threshold == 80
-          - subnet_info.objects[0].asm_config.forecast_period == 10
+          - subnet_info.objects[0].asm_config.asm_threshold == 70
+          - subnet_info.objects[0].asm_config.forecast_period == 12
           - subnet_info.objects[0].inheritance_sources.asm_config.asm_threshold.action == "override"
           - subnet_info.objects[0].inheritance_sources.asm_config.forecast_period.action == "override"
 
@@ -164,12 +172,13 @@
         space: "{{ ip_space.id }}"
         state: "present"
         comment: "Comment."
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -183,12 +192,13 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_client_update: "server"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -202,12 +212,13 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_conflict_resolution_mode: "no_check_with_dhcid"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -221,12 +232,13 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_domain: "abc"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -240,18 +252,19 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_generate_name: "true"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].ddns_generate_name == "true"
+          - subnet_info.objects[0].ddns_generate_name == true
 
     - name: "Create a Subnet with ddns_send_updates set to false"
       infoblox.bloxone.ipam_subnet:
@@ -259,18 +272,19 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_send_updates: "false"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].ddns_send_updates == "false"
+          - subnet_info.objects[0].ddns_send_updates == false
 
     - name: "Create a Subnet with ddns_ttl_percent set to 25"
       infoblox.bloxone.ipam_subnet:
@@ -278,12 +292,13 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_ttl_percent: 25
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -297,18 +312,19 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_update_on_renew: "true"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].ddns_update_on_renew == "true"
+          - subnet_info.objects[0].ddns_update_on_renew == true
 
     - name: "Create a Subnet with ddns_use_conflict_resolution set to false"
       infoblox.bloxone.ipam_subnet:
@@ -316,24 +332,24 @@
         space: "{{ ip_space.id }}"
         state: "present"
         ddns_use_conflict_resolution: "false"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].ddns_use_conflict_resolution == "false"
+          - subnet_info.objects[0].ddns_use_conflict_resolution == false
 
     - name: "Create a Subnet with DHCP config overridden"
       infoblox.bloxone.ipam_subnet:
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
-        state: "present"
         dhcp_config:
           lease_time: 3600
         inheritance_sources:
@@ -362,13 +378,15 @@
               action: inherit
             lease_time_v6:
               action: inherit
+        state: "present"
       register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
-        register: subnet_info
+          cidr: 24
+      register: subnet_info
     - assert:
         that:
           - subnet is not failed
@@ -382,18 +400,19 @@
         space: "{{ ip_space.id }}"
         state: "present"
         disable_dhcp: "true"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].disable_dhcp == "true"
+          - subnet_info.objects[0].disable_dhcp == true
 
     - name: "Create a Subnet with hostname_rewrite_enabled set to true"
       infoblox.bloxone.ipam_subnet:
@@ -401,18 +420,19 @@
         space: "{{ ip_space.id }}"
         state: "present"
         hostname_rewrite_enabled: "true"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].hostname_rewrite_enabled == "true"
+          - subnet_info.objects[0].hostname_rewrite_enabled == true
 
     - name: "Create a Subnet with rebind_time set to 60 and renew_time set to 50"
       infoblox.bloxone.ipam_subnet:
@@ -421,12 +441,13 @@
         state: "present"
         rebind_time: 60
         renew_time: 50
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
@@ -439,21 +460,22 @@
       infoblox.bloxone.ipam_subnet:
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
-        state: "present"
         tags:
-          location: "site-1"
-        register: subnet
+          location: "{{ tag_value }}"
+        state: "present"
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
-          address: "10.0.0.0/24"
+          address: "10.0.0.0"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - ip_space_info.objects[0].tags.location == "site-1"
+          - subnet_info.objects[0].tags.location == tag_value
 
     - name: "Create a Subnet with separate address and cidr"
       infoblox.bloxone.ipam_subnet:
@@ -461,13 +483,13 @@
         cidr: 24
         space: "{{ ip_space.id }}"
         state: "present"
-        register: subnet
+      register: subnet
     - name: Get information about the Subnet
       infoblox.bloxone.ipam_subnet_info:
         filters:
           address: "10.0.0.0"
-          cidr: "24"
           space: "{{ ip_space.id }}"
+          cidr: 24
       register: subnet_info
     - assert:
         that:

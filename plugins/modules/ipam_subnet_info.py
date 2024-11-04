@@ -1701,7 +1701,11 @@ class SubnetInfoModule(BloxoneAnsibleModule):
 
         filter_str = None
         if self.params["filters"] is not None:
-            filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["filters"].items()])
+            filter_str = (
+                f"address=='{self.params['filters']['address']}' "
+                + f"and space=='{self.params['filters']['space']}' "
+                + f"and cidr=={self.params['filters']['cidr']}"
+            )
         elif self.params["filter_query"] is not None:
             filter_str = self.params["filter_query"]
 

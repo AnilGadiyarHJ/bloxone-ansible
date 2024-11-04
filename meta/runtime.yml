@@ -16,6 +16,8 @@ action_groups:
     - ipam_ip_space_info
     - ipam_subnet
     - ipam_subnet_info
+    - ipam_address_block
+    - ipam_address_block_info
 
 plugin_routing:
     modules:
@@ -45,11 +47,21 @@ plugin_routing:
           deprecation:
             removal_version: 3.0.0
             warning_text: Use infoblox.bloxone.dns_view_info instead.
+
+        b1_ipam_address_block:
+          deprecation:
+            removal_version: 3.0.0
+            warning_text: Use infoblox.bloxone.ipam_address_block instead.
+        b1_ipam_address_block_gather:
+          deprecation:
+            removal_version: 3.0.0
+            warning_text: Use infoblox.bloxone.ipam_address_block_info instead.
+
         b1_dns_auth_zone:
           deprecation:
             removal_version: 3.0.0
             warning_text: Use infoblox.bloxone.dns_auth_zone instead.
-        b1_dns_auth_zone_gather:
+        b1_dns_zone_gather:
           deprecation:
             removal_version: 3.0.0
             warning_text: Use infoblox.bloxone.dns_auth_zone_info instead.
