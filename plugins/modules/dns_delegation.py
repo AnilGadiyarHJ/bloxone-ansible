@@ -265,7 +265,6 @@ class DelegationModule(BloxoneAnsibleModule):
         # functions
         try:
             self.existing = self.find()
-            print(self.existing)
             item = {}
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()

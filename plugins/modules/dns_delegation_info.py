@@ -57,7 +57,7 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r""" 
-    - name: Get Information about the Delegation
+  - name: Get Information about the Delegation
       infoblox.bloxone.dns_delegation_info:
         id: '{{ delegation_fqdn_id }}'
         
@@ -73,7 +73,7 @@ EXAMPLES = r"""
     - name: Get Delegation information by tag filters
       infoblox.bloxone.dns_delegation_info:
         tag_filters:
-          location: site-1
+          location: site-1  
 """  # noqa: E501
 
 RETURN = r"""
