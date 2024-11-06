@@ -56,6 +56,26 @@ extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
+EXAMPLES = r""" 
+    - name: Get Information about the Delegation
+      infoblox.bloxone.dns_delegation_info:
+        id: '{{ delegation_fqdn_id }}'
+        
+    - name: Get Delegation information by filters (e.g. fqdn)
+      infoblox.bloxone.dns_delegation_info:
+        filters:
+          fqdn: "delegation.example_zone."
+
+    - name: Get Delegation information by raw filter query
+      infoblox.bloxone.dns_delegation_info:
+        filter_query: name=='delegation.example_zone'
+        
+    - name: Get Delegation information by tag filters
+      infoblox.bloxone.dns_delegation_info:
+        tag_filters:
+          location: site-1
+"""  # noqa: E501
+
 RETURN = r"""
 id:
     description:
