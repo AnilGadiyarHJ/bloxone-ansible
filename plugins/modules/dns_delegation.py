@@ -76,26 +76,26 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-  - name: Create an Auth Zone
-    infoblox.bloxone.dns_auth_zone:
-      name: "example_zone"
-      state: "present"
-      
-  - name: Create a Delegation (check mode)
-    infoblox.bloxone.dns_delegation:
-      fqdn: "test_delegation.example_zone."
-      delegation_servers:
-        - fqdn: "ns1.example.com."
-          address: "12.0.0.0"
-      state: present
-      tags:
-        location: "my-location"
-        
-  - name: "Delete the DNS Delegation"
-    infoblox.bloxone.dns_delegation:
-      fqdn: "test_delegation.example_zone."
-      state: absent
- """  # noqa: E501
+- name: Create an Auth Zone
+  infoblox.bloxone.dns_auth_zone:
+    name: example_zone
+    state: present
+
+- name: Create a Delegation
+  infoblox.bloxone.dns_delegation:
+    fqdn: test_delegation.example_zone.
+    delegation_servers:
+      - fqdn: ns1.example.com.
+        address: 12.0.0.0
+    state: present
+    tags:
+      location: my-location
+
+- name: Delete the DNS Delegation
+  infoblox.bloxone.dns_delegation:
+    fqdn: test_delegation.example_zone.
+    state: absent
+"""  # noqa: E501
 
 RETURN = r"""
 id:

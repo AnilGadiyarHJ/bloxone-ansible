@@ -56,8 +56,8 @@ extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
-EXAMPLES = r""" 
-  - name: Get Information about the Delegation
+EXAMPLES = r"""
+    - name: Get Information about the Delegation
       infoblox.bloxone.dns_delegation_info:
         id: '{{ delegation_fqdn_id }}'
         
