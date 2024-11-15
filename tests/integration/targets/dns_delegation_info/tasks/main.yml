@@ -1,3 +1,4 @@
+---
 - module_defaults:
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
@@ -49,7 +50,6 @@
           - delegation_info.objects | length == 1
           - delegation_info.objects[0].id == delegation.id
 
-
     - name: Get Delegation information by tag filters (if any)
       infoblox.bloxone.dns_delegation_info:
         tag_filters:
@@ -78,4 +78,3 @@
         name: "{{ _view.id }}"
         state: absent
       ignore_errors: true
-
