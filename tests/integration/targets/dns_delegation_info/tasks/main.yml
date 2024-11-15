@@ -2,21 +2,11 @@
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
       api_key: "{{ api_key }}"
-  block:
-    # Create a random Delegation name to avoid conflicts
-    - ansible.builtin.set_fact:
-        auth_zone_fqdn: "test-auth-zone-{{ 999999 | random | string }}.com."
-        tag_value: "site-{{ 999999 | random | string }}"
-    - ansible.builtin.set_fact:
-        delegation_fqdn: "test-delegation--{{ 999999 | random | string }}.{{ auth_zone_fqdn }}"
 
-    - name: Create an Auth Zone in the specified view
-      infoblox.bloxone.dns_auth_zone:
-        fqdn: "{{ auth_zone_fqdn }}"
-        primary_type: cloud
-        view: "{{ _view.id }}"
-        state: present
-      register: auth_zone
+  block:
+    - ansible.builtin.set_fact:
+        delegation_fqdn: "test-delegation--{{ 999999 | random | string }}.{{ _fqdn_auth_zone }}"
+        tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create a Delegation
       infoblox.bloxone.dns_delegation:
@@ -79,7 +69,7 @@
 
     - name: "Clean up Authorization Zone"
       infoblox.bloxone.dns_auth_zone:
-        fqdn: "{{ auth_zone_fqdn }}"
+        fqdn: "{{ _fqdn_auth_zone }}"
         state: absent
       ignore_errors: true
 
@@ -88,3 +78,4 @@
         name: "{{ _view.id }}"
         state: absent
       ignore_errors: true
+

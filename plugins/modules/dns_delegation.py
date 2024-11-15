@@ -83,7 +83,7 @@ EXAMPLES = r"""
 
 - name: Create a Delegation
   infoblox.bloxone.dns_delegation:
-    fqdn: test_delegation.example_zone.
+    fqdn: delegation.example_zone.
     delegation_servers:
       - fqdn: ns1.example.com.
         address: 12.0.0.0
@@ -93,7 +93,7 @@ EXAMPLES = r"""
 
 - name: Delete the DNS Delegation
   infoblox.bloxone.dns_delegation:
-    fqdn: test_delegation.example_zone.
+    fqdn: delegation.example_zone.
     state: absent
 """  # noqa: E501
 

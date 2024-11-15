@@ -1,3 +1,4 @@
+---
 - module_defaults:
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
@@ -6,17 +7,7 @@
   block:
     # Create a random Delegation name to avoid conflicts
     - ansible.builtin.set_fact:
-        auth_zone_fqdn: "test-auth-zone-{{ 999999 | random | string }}.com."
-    - ansible.builtin.set_fact:
-        delegation_fqdn: "test-delegation--{{ 999999 | random | string }}.{{ auth_zone_fqdn }}"
-
-    - name: Create an Auth Zone in the specified view
-      infoblox.bloxone.dns_auth_zone:
-        fqdn: "{{ auth_zone_fqdn }}"
-        primary_type: cloud
-        view: "{{ _view.id }}"
-        state: present
-      register: auth_zone
+        delegation_fqdn: "test-delegation--{{ 999999 | random | string }}.{{ _fqdn_auth_zone }}"
 
     - name: Create a Delegation (check mode)
       infoblox.bloxone.dns_delegation:
@@ -39,8 +30,6 @@
           - delegation_info is not failed
           - delegation_info.objects | length == 0
 
-
-    # Create a Delegation
     - name: Create a Delegation
       infoblox.bloxone.dns_delegation:
         fqdn: "{{ delegation_fqdn }}"
@@ -235,6 +224,7 @@
           - delegation_info.objects[0].fqdn == delegation_fqdn
           - delegation_info.objects[0].comment == "Delegation zone created with Ansible for tags test"
           - delegation_info.objects[0].tags.location == "site-1"
+          - delegation_info.objects[0].view == _view.id
 
     - name: Create DNS Delegation in view
       infoblox.bloxone.dns_delegation:
@@ -266,7 +256,7 @@
 
     - name: "Clean up Authorization Zone"
       infoblox.bloxone.dns_auth_zone:
-        fqdn: "{{ auth_zone_fqdn }}"
+        fqdn: "{{ _fqdn_auth_zone }}"
         state: absent
       ignore_errors: true
 

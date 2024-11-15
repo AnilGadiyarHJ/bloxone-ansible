@@ -68,7 +68,7 @@ EXAMPLES = r"""
 
     - name: Get Delegation information by raw filter query
       infoblox.bloxone.dns_delegation_info:
-        filter_query: name=='delegation.example_zone'
+        filter_query: fqdn=='delegation.example_zone'
         
     - name: Get Delegation information by tag filters
       infoblox.bloxone.dns_delegation_info:
