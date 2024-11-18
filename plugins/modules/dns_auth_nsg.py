@@ -547,12 +547,13 @@ def main():
                 tsig_enabled=dict(type="bool"),
                 tsig_key=dict(
                     type="dict",
+                    no_log=True,
                     options=dict(
                         algorithm=dict(type="str"),
                         comment=dict(type="str"),
-                        key=dict(type="str"),
+                        key=dict(type="str", no_log=True),
                         name=dict(type="str"),
-                        secret=dict(type="str"),
+                        secret=dict(type="str", no_log=True),
                     ),
                 ),
                 type=dict(type="str"),
@@ -568,12 +569,13 @@ def main():
                 tsig_enabled=dict(type="bool"),
                 tsig_key=dict(
                     type="dict",
+                    no_log=True,
                     options=dict(
                         algorithm=dict(type="str"),
                         comment=dict(type="str"),
-                        key=dict(type="str"),
+                        key=dict(type="str", no_log=True),
                         name=dict(type="str"),
-                        secret=dict(type="str"),
+                        secret=dict(type="str", no_log=True),
                     ),
                 ),
             ),
