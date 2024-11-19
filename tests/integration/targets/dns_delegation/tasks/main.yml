@@ -131,6 +131,7 @@
           - delegation_info.objects | length == 1
           - delegation_info.objects[0].id == delegation.id
           - delegation_info.objects[0].comment == "Delegation zone is created by Ansible"
+          - delegation_info.objects[0].view == _view.id
 
     - name: Create DNS Delegation with Delegation Server
       infoblox.bloxone.dns_delegation:
@@ -224,27 +225,6 @@
           - delegation_info.objects[0].fqdn == delegation_fqdn
           - delegation_info.objects[0].comment == "Delegation zone created with Ansible for tags test"
           - delegation_info.objects[0].tags.location == "site-1"
-          - delegation_info.objects[0].view == _view.id
-
-    - name: Create DNS Delegation in view
-      infoblox.bloxone.dns_delegation:
-        fqdn: "{{ delegation_fqdn }}"
-        comment: "Delegation zone created with Ansible for view test"
-        delegation_servers:
-          - address: "12.0.0.0"
-            fqdn: "ns1.com."
-        state: present
-      register: delegation
-    - name: Get Information about the DNS Delegation  view
-      infoblox.bloxone.dns_delegation_info:
-        filters:
-          fqdn: "{{ delegation_fqdn }}"
-      register: delegation_info
-    - assert:
-        that:
-          - delegation_info is not failed
-          - delegation_info.objects | length == 1
-          - delegation_info.objects[0].fqdn == delegation_fqdn
           - delegation_info.objects[0].view == _view.id
 
   always:
