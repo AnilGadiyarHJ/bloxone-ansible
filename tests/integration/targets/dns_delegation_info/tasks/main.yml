@@ -21,16 +21,6 @@
         state: present
       register: delegation
 
-    - name: Get Information about the Delegation
-      infoblox.bloxone.dns_delegation_info:
-        filters:
-          fqdn: "{{ delegation_fqdn }}"
-      register: delegation_info
-    - assert:
-        that:
-          - delegation_info.objects | length == 1
-          - delegation_info.objects[0].fqdn == delegation.object.fqdn
-
     - name: Get Delegation information by filters (FQDN)
       infoblox.bloxone.dns_delegation_info:
         filters:
