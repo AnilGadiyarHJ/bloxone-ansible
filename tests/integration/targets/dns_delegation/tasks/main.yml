@@ -50,7 +50,6 @@
           - delegation_info.objects | length == 1
           - delegation_info.objects[0].fqdn == delegation.object.fqdn
 
-    # Create a Delegation (idempotent)
     - name: Create a Delegation (idempotent)
       infoblox.bloxone.dns_delegation:
         fqdn: "{{ delegation_fqdn }}"
@@ -64,7 +63,6 @@
           - delegation is not changed
           - delegation is not failed
 
-    # Delete the Delegation (check mode)
     - name: Delete the Delegation (check mode)
       infoblox.bloxone.dns_delegation:
         fqdn: "{{ delegation_fqdn }}"
@@ -82,7 +80,6 @@
           - delegation_info is not failed
           - delegation_info.objects | length == 1
 
-    # Delete the Delegation
     - name: Delete the Delegation
       infoblox.bloxone.dns_delegation:
         fqdn: "{{ delegation_fqdn }}"
@@ -99,7 +96,6 @@
           - delegation_info is not failed
           - delegation_info.objects | length == 0
 
-    # Delete the Delegation (idempotent)
     - name: Delete the Delegation (idempotent)
       infoblox.bloxone.dns_delegation:
         fqdn: "{{ delegation_fqdn }}"

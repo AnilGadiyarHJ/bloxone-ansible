@@ -78,7 +78,7 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 - name: Create an Auth Zone
   infoblox.bloxone.dns_auth_zone:
-    name: example_zone
+    fqdn: example_zone
     state: present
 
 - name: Create a Delegation
