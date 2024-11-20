@@ -79,6 +79,7 @@ EXAMPLES = r"""
 - name: Create an Auth Zone
   infoblox.bloxone.dns_auth_zone:
     fqdn: example_zone
+    primary_type: cloud
     state: present
 
 - name: Create a Delegation
