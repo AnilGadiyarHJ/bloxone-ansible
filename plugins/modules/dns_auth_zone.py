@@ -630,12 +630,12 @@ extends_documentation_fragment:
 EXAMPLES = r"""
   - name: Create an Auth Zone
     infoblox.bloxone.dns_auth_zone:
-      fqdn: "example_zone"
+      name: "example_zone"
       state: "present"
 
   - name: Create an Auth Zone with Additional Fields
     infoblox.bloxone.dns_auth_zone:
-      fqdn: "example_zone"
+      name: "example_zone"
       comment: "Example Auth Zone"
       query_acl:
         - access: "allow"
@@ -649,7 +649,7 @@ EXAMPLES = r"""
 
   - name: Delete the Zone
     infoblox.bloxone.dns_auth_zone:
-      fqdn: "example_zone"
+      name: "example_zone"
       state: "absent"
 """  # noqa: E501
 

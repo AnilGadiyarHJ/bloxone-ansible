@@ -238,6 +238,6 @@
 
     - name: "Clean up  DNS View"
       infoblox.bloxone.dns_view:
-        name: "{{ _view.id }}"
+        name: "{{ name }}"
         state: absent
       ignore_errors: true
