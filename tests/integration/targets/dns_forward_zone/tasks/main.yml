@@ -244,3 +244,4 @@
         state: absent
       register: _view
       ignore_errors: true
+
