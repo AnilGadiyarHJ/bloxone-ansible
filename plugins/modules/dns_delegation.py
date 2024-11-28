@@ -76,7 +76,7 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-- name: Create an Auth Zone
+- name: Create an Auth Zone (Delegation requires a parent zone)
   infoblox.bloxone.dns_auth_zone:
     fqdn: example_zone
     primary_type: cloud
