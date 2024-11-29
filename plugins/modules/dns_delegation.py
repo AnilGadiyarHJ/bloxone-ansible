@@ -227,7 +227,7 @@ class DelegationModule(BloxoneAnsibleModule):
                     return None
                 raise e
         else:
-            filter = f"fqdn=='{self.params['fqdn']}'"
+            filter = f"fqdn=='{self.params['fqdn']}'" #and view =='{self.params['view']}'"
             resp = DelegationApi(self.client).list(filter=filter)
             if len(resp.results) == 1:
                 return resp.results[0]
@@ -316,7 +316,7 @@ def main():
         fqdn=dict(type="str"),
         parent=dict(type="str"),
         tags=dict(type="dict"),
-        view=dict(type="str"),
+        view=dict(type="str", required=True),
     )
 
     module = DelegationModule(
