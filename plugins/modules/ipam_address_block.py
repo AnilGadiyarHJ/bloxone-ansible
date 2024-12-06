@@ -147,14 +147,6 @@ options:
             - "The shared DHCP configuration that controls how leases are issued for the address block."
         type: dict
         suboptions:
-            abandoned_reclaim_time:
-                description:
-                    - "The abandoned reclaim time in seconds for IPV4 clients."
-                type: int
-            abandoned_reclaim_time_v6:
-                description:
-                    - "The abandoned reclaim time in seconds for IPV6 clients."
-                type: int
             allow_unknown:
                 description:
                     - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -474,32 +466,6 @@ options:
                     - "The inheritance configuration for I(dhcp_config) field."
                 type: dict
                 suboptions:
-                    abandoned_reclaim_time:
-                        description:
-                            - "The inheritance configuration for I(abandoned_reclaim_time) field from I(DHCPConfig) object."
-                        type: dict
-                        suboptions:
-                            action:
-                                description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
-                                type: str
-                    abandoned_reclaim_time_v6:
-                        description:
-                            - "The inheritance configuration for I(abandoned_reclaim_time_v6) field from I(DHCPConfig) object."
-                        type: dict
-                        suboptions:
-                            action:
-                                description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
-                                type: str
                     allow_unknown:
                         description:
                             - "The inheritance configuration for I(allow_unknown) field from I(DHCPConfig) object."
@@ -781,10 +747,6 @@ EXAMPLES = r"""
           dhcp_config:
             lease_time:
               action: override
-            abandoned_reclaim_time:
-              action: inherit
-            abandoned_reclaim_time_v6:
-              action: inherit
             allow_unknown:
               action: inherit
             allow_unknown_v6:
@@ -974,16 +936,6 @@ item:
             type: dict
             returned: Always
             contains:
-                abandoned_reclaim_time:
-                    description:
-                        - "The abandoned reclaim time in seconds for IPV4 clients."
-                    type: int
-                    returned: Always
-                abandoned_reclaim_time_v6:
-                    description:
-                        - "The abandoned reclaim time in seconds for IPV6 clients."
-                    type: int
-                    returned: Always
                 allow_unknown:
                     description:
                         - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -1672,66 +1624,6 @@ item:
                     type: dict
                     returned: Always
                     contains:
-                        abandoned_reclaim_time:
-                            description:
-                                - "The inheritance configuration for I(abandoned_reclaim_time) field from I(DHCPConfig) object."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
-                                    description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
-                                    type: int
-                                    returned: Always
-                        abandoned_reclaim_time_v6:
-                            description:
-                                - "The inheritance configuration for I(abandoned_reclaim_time_v6) field from I(DHCPConfig) object."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
-                                    description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
-                                    type: int
-                                    returned: Always
                         allow_unknown:
                             description:
                                 - "The inheritance configuration for I(allow_unknown) field from I(DHCPConfig) object."
@@ -2381,9 +2273,32 @@ class AddressBlockModule(BloxoneAnsibleModule):
             self.params["address"], netmask = self.params["address"].split("/")
             self.params["cidr"] = int(netmask)
 
-        exclude = ["state", "csp_url", "api_key", "id"]
+        exclude = [
+            "state",
+            "csp_url",
+            "api_key",
+            "id",
+            "abandoned_reclaim_time",
+            "abandoned_reclaim_time_v6",
+            "echo_client_id",
+        ]
+
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = AddressBlock.from_dict(self._payload_params)
+
+        # Safely remove unwanted attributes
+        if self._payload.dhcp_config:
+            self._payload.dhcp_config.abandoned_reclaim_time = None
+            self._payload.dhcp_config.abandoned_reclaim_time_v6 = None
+            self._payload.dhcp_config.echo_client_id = None
+
+            # Handle inheritance sources safely
+        if self._payload.inheritance_sources and self._payload.inheritance_sources.dhcp_config:
+            inherited_dhcp_config = self._payload.inheritance_sources.dhcp_config
+            setattr(inherited_dhcp_config, "abandoned_reclaim_time", None)
+            setattr(inherited_dhcp_config, "abandoned_reclaim_time_v6", None)
+            setattr(inherited_dhcp_config, "echo_client_id", None)
+
         self._existing = None
 
     @property
@@ -2525,8 +2440,6 @@ def main():
         dhcp_config=dict(
             type="dict",
             options=dict(
-                abandoned_reclaim_time=dict(type="int"),
-                abandoned_reclaim_time_v6=dict(type="int"),
                 allow_unknown=dict(type="bool"),
                 allow_unknown_v6=dict(type="bool"),
                 echo_client_id=dict(type="bool"),
@@ -2663,18 +2576,6 @@ def main():
                 dhcp_config=dict(
                     type="dict",
                     options=dict(
-                        abandoned_reclaim_time=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        abandoned_reclaim_time_v6=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
                         allow_unknown=dict(
                             type="dict",
                             options=dict(
