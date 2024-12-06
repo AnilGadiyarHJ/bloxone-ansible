@@ -1,0 +1,16 @@
+---
+#TODO: add tests
+# The following require additional plugins to be supported.
+# - Forward Zone with Hosts
+# - Forward Zone with Internal Forwarders
+# - Forward Zone with NSGs
+-
+- module_defaults:
+    group/infoblox.bloxone.all:
+      csp_url: "{{ csp_url }}"
+      api_key: "{{ api_key }}"
+  block:
+    # Create a random Forward Zone FQDN to avoid conflicts
+    - ansible.builtin.set_fact:
+        fqdn: "fw-zone-{{ 999999 | random | string }}.com."
+
