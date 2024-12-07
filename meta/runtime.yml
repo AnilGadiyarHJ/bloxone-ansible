@@ -4,6 +4,7 @@ action_groups:
         extend_group:
           - ipam
           - dns
+          - keys
   dns:
     - dns_view
     - dns_view_info
@@ -18,6 +19,9 @@ action_groups:
     - ipam_subnet_info
     - ipam_address_block
     - ipam_address_block_info
+  keys:
+    - tsig_key
+    - tsig_key_info
 
 plugin_routing:
     modules:
