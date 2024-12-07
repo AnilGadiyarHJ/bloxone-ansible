@@ -25,6 +25,7 @@
       infoblox.bloxone.dns_delegation_info:
         filters:
           fqdn: "{{ delegation_fqdn }}"
+          view: "{{ _view.id }}"
       register: delegation_info
     - assert:
         that:
@@ -54,6 +55,7 @@
     - name: "Clean up DNS Delegation"
       infoblox.bloxone.dns_delegation:
         fqdn: "{{ delegation_fqdn }}"
+        view: "{{ _view.id }}"
         state: absent
       ignore_errors: true
 
