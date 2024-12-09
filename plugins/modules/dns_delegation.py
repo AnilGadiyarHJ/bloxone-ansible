@@ -70,6 +70,7 @@ options:
         description:
             - "The resource identifier."
         type: str
+        required: true
 
 extends_documentation_fragment:
     - infoblox.bloxone.common
@@ -85,6 +86,7 @@ EXAMPLES = r"""
 - name: Create a Delegation
   infoblox.bloxone.dns_delegation:
     fqdn: delegation.example_zone.
+    view: default
     delegation_servers:
       - fqdn: ns1.example.com.
         address: 12.0.0.0
@@ -95,6 +97,7 @@ EXAMPLES = r"""
 - name: Delete the DNS Delegation
   infoblox.bloxone.dns_delegation:
     fqdn: delegation.example_zone.
+    view: default
     state: absent
 """  # noqa: E501
 
@@ -227,7 +230,7 @@ class DelegationModule(BloxoneAnsibleModule):
                     return None
                 raise e
         else:
-            filter = f"fqdn=='{self.params['fqdn']}'" #and view =='{self.params['view']}'"
+            filter = f"fqdn=='{self.params['fqdn']}' and view =='{self.params['view']}'"
             resp = DelegationApi(self.client).list(filter=filter)
             if len(resp.results) == 1:
                 return resp.results[0]
@@ -248,7 +251,7 @@ class DelegationModule(BloxoneAnsibleModule):
             return None
 
         update_body = self.payload
-        update_body = self.validate_readonly_on_update(self.existing, update_body, ["fqdn"])
+        update_body = self.validate_readonly_on_update(self.existing, update_body, ["fqdn", "view"])
 
         resp = DelegationApi(self.client).update(id=self.existing.id, body=update_body)
         return resp.result.model_dump(by_alias=True, exclude_none=True)

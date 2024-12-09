@@ -55,7 +55,7 @@ EXAMPLES = r"""
       infoblox.bloxone.dns_delegation_info:
         filters:
           fqdn: "delegation.example_zone."
-
+          
     - name: Get Delegation information by filters (e.g. fqdn,view)
       infoblox.bloxone.dns_delegation_info:
         filters:
