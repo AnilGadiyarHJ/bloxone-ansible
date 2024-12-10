@@ -255,6 +255,10 @@
           dhcp_config:
             lease_time:
               action: override
+            abandoned_reclaim_time:
+              action: inherit
+            abandoned_reclaim_time_v6:
+              action: inherit
             allow_unknown:
               action: inherit
             allow_unknown_v6:
