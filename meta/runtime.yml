@@ -13,6 +13,8 @@ action_groups:
     - dns_forward_zone_info
     - dns_forward_nsg
     - dns_forward_nsg_info
+    - dns_delegation
+    - dns_delegation_info
   ipam:
     - ipam_ip_space
     - ipam_ip_space_info
