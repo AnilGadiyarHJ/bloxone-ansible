@@ -224,7 +224,7 @@ class ForwardNsgModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = ForwardNsgApi(self.client).read(self.params["id"], inherit="full")
+                resp = ForwardNsgApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
