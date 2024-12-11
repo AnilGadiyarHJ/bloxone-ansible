@@ -2433,7 +2433,8 @@ class SubnetModule(BloxoneAnsibleModule):
             self.params["address"], netmask = self.params["address"].split("/")
             self.params["cidr"] = int(netmask)
 
-        exclude = ["state", "csp_url", "api_key", "id"]
+        exclude = ["state", "csp_url", "api_key", "id", "abandoned_reclaim_time", "abandoned_reclaim_time_v6",
+                   "echo_client_id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = Subnet.from_dict(self._payload_params)
         # Safely remove unwanted attributes
@@ -2442,12 +2443,6 @@ class SubnetModule(BloxoneAnsibleModule):
             self._payload.dhcp_config.abandoned_reclaim_time_v6 = None
             self._payload.dhcp_config.echo_client_id = None
 
-            # Handle inheritance sources safely
-        if self._payload.inheritance_sources and self._payload.inheritance_sources.dhcp_config:
-            inherited_dhcp_config = self._payload.inheritance_sources.dhcp_config
-            setattr(inherited_dhcp_config, "abandoned_reclaim_time", None)
-            setattr(inherited_dhcp_config, "abandoned_reclaim_time_v6", None)
-            setattr(inherited_dhcp_config, "echo_client_id", None)
         self._existing = None
 
     @property
