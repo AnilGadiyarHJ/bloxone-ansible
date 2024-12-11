@@ -2381,8 +2381,15 @@ class AddressBlockModule(BloxoneAnsibleModule):
             self.params["address"], netmask = self.params["address"].split("/")
             self.params["cidr"] = int(netmask)
 
-        exclude = ["state", "csp_url", "api_key", "id", "abandoned_reclaim_time", "abandoned_reclaim_time_v6",
-                   "echo_client_id"]
+        exclude = [
+            "state",
+            "csp_url",
+            "api_key",
+            "id",
+            "abandoned_reclaim_time",
+            "abandoned_reclaim_time_v6",
+            "echo_client_id",
+        ]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = AddressBlock.from_dict(self._payload_params)
 
