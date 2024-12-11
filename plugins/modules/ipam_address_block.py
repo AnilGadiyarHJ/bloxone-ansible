@@ -2386,7 +2386,7 @@ class AddressBlockModule(BloxoneAnsibleModule):
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = AddressBlock.from_dict(self._payload_params)
 
-        # Safely remove unwanted attributes
+        # Unset unsupported DHCP configuration attributes
         if self._payload.dhcp_config:
             self._payload.dhcp_config.abandoned_reclaim_time = None
             self._payload.dhcp_config.abandoned_reclaim_time_v6 = None
