@@ -22,7 +22,8 @@
 
     - name: Get TSIG Key Information by ID
       infoblox.bloxone.tsig_key_info:
-        id: "{{ tsig_key.id }}"
+        filters:
+          id: "{{ tsig_key.id }}"
       register: tsig_key_info
     - assert:
         that:
