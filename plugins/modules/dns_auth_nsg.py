@@ -194,7 +194,7 @@ EXAMPLES = r"""
           type: "primary"
       state: "present"
       tags:
-        location: "my-location"
+        location: "site-1"
 
   - name: Delete the Auth NSG
     infoblox.bloxone.dns_auth_nsg:
