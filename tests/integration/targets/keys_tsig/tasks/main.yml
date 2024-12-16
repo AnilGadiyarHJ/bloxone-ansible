@@ -103,7 +103,7 @@
           - tsig_key is not changed
           - tsig_key is not failed
 
-    - name: Create a TSIG Key with Algorithm
+    - name: Create a TSIG Key with Algorithm type hmac_sha256
       infoblox.bloxone.tsig_key:
         name: "{{ tsig_key_name }}"
         algorithm: "hmac_sha256"
@@ -122,6 +122,26 @@
           - tsig_key_info.objects | length == 1
           - tsig_key_info.objects[0].name == tsig_key_name
           - tsig_key_info.objects[0].algorithm == "hmac_sha256"
+
+    - name: Create a TSIG Key with Algorithm type hmac_sha384
+      infoblox.bloxone.tsig_key:
+        name: "{{ tsig_key_name }}"
+        algorithm: "hmac_sha384"
+        secret: "{{ tsig_key_secret }}"
+        state: present
+      register: tsig_key
+    - name: Get TSIG Key Information
+      infoblox.bloxone.tsig_key_info:
+        filters:
+          name: "{{ tsig_key_name }}"
+      register: tsig_key_info
+    - name: Assert TSIG Key Algorithm
+      assert:
+        that:
+          - tsig_key_info is not failed
+          - tsig_key_info.objects | length == 1
+          - tsig_key_info.objects[0].name == tsig_key_name
+          - tsig_key_info.objects[0].algorithm == "hmac_sha384"
 
     - name: Create a TSIG Key with a Comment
       infoblox.bloxone.tsig_key:
