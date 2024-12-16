@@ -1,8 +1,5 @@
 ---
 
-#TODO: add tests
-# - nsgs
-
 - module_defaults:
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
@@ -200,11 +197,6 @@
           - forward_nsg_info.objects[0].id == forward_nsg.id
           - forward_nsg_info.objects[0].tags.location == "site-1"
 
-    - name: Create Primary Forward NSG
-      infoblox.bloxone.dns_forward_nsg:
-        name: "{{ forward_nsg_name }}"
-        state: present
-      register: forward_nsg
     - name: Create Secondary Forward NSG referencing Primary
       infoblox.bloxone.dns_forward_nsg:
         name: "{{ forward_nsg_secondary_name }}"
@@ -223,31 +215,16 @@
           - ssecondary_forward_nsg_info.objects | length == 1
           - ssecondary_forward_nsg_info.objects[0].nsgs | length == 1
           - ssecondary_forward_nsg_info.objects[0].nsgs[0] == forward_nsg.id
-          # Unlinking block
-    - block:
-        - name: Unlink Primary NSG from Secondary
-          infoblox.bloxone.dns_forward_nsg:
-            id: "{{ secondary_forward_nsg.id }}"
-            name: "{{ forward_nsg_secondary_name }}"
-            nsgs: [ ]
-            state: present
-      rescue:
-        - name: Cleanup in case of failure (force unlink Secondary from Primary)
-          infoblox.bloxone.dns_forward_nsg:
-            id: "{{ secondary_forward_nsg.id | default('') }}"
-            nsgs: [ ]
-            state: present
-          when: secondary_forward_nsg is defined
 
   always:
-    - name: "Delete Forward NSG"
-      infoblox.bloxone.dns_forward_nsg:
-        name: "{{ forward_nsg_name }}"
-        state: "absent"
-      ignore_errors: true
-
     - name: "Delete Secondary Forward NSG"
       infoblox.bloxone.dns_forward_nsg:
         name: "{{ forward_nsg_secondary_name }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete Forward NSG"
+      infoblox.bloxone.dns_forward_nsg:
+        name: "{{ forward_nsg_name }}"
         state: "absent"
       ignore_errors: true

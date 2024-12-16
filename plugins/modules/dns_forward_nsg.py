@@ -96,7 +96,7 @@ EXAMPLES = r"""
           type: "forwarder"
       state: "present"
       tags:
-        location: "my-location"
+        location: "site-1"
         
   - name: Delete the Forward NSG
     infoblox.bloxone.dns_forward_nsg:
