@@ -147,14 +147,6 @@ options:
             - "The shared DHCP configuration that controls how leases are issued for the address block."
         type: dict
         suboptions:
-            abandoned_reclaim_time:
-                description:
-                    - "The abandoned reclaim time in seconds for IPV4 clients."
-                type: int
-            abandoned_reclaim_time_v6:
-                description:
-                    - "The abandoned reclaim time in seconds for IPV6 clients."
-                type: int
             allow_unknown:
                 description:
                     - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -974,16 +966,6 @@ item:
             type: dict
             returned: Always
             contains:
-                abandoned_reclaim_time:
-                    description:
-                        - "The abandoned reclaim time in seconds for IPV4 clients."
-                    type: int
-                    returned: Always
-                abandoned_reclaim_time_v6:
-                    description:
-                        - "The abandoned reclaim time in seconds for IPV6 clients."
-                    type: int
-                    returned: Always
                 allow_unknown:
                     description:
                         - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -2398,6 +2380,7 @@ class AddressBlockModule(BloxoneAnsibleModule):
             self._payload.dhcp_config.abandoned_reclaim_time = None
             self._payload.dhcp_config.abandoned_reclaim_time_v6 = None
             self._payload.dhcp_config.echo_client_id = None
+
         self._existing = None
 
     @property
@@ -2539,8 +2522,6 @@ def main():
         dhcp_config=dict(
             type="dict",
             options=dict(
-                abandoned_reclaim_time=dict(type="int"),
-                abandoned_reclaim_time_v6=dict(type="int"),
                 allow_unknown=dict(type="bool"),
                 allow_unknown_v6=dict(type="bool"),
                 echo_client_id=dict(type="bool"),

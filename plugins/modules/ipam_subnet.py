@@ -147,14 +147,6 @@ options:
             - "The DHCP configuration of the subnet that controls how leases are issued."
         type: dict
         suboptions:
-            abandoned_reclaim_time:
-                description:
-                    - "The abandoned reclaim time in seconds for IPV4 clients."
-                type: int
-            abandoned_reclaim_time_v6:
-                description:
-                    - "The abandoned reclaim time in seconds for IPV6 clients."
-                type: int
             allow_unknown:
                 description:
                     - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -980,16 +972,6 @@ item:
             type: dict
             returned: Always
             contains:
-                abandoned_reclaim_time:
-                    description:
-                        - "The abandoned reclaim time in seconds for IPV4 clients."
-                    type: int
-                    returned: Always
-                abandoned_reclaim_time_v6:
-                    description:
-                        - "The abandoned reclaim time in seconds for IPV6 clients."
-                    type: int
-                    returned: Always
                 allow_unknown:
                     description:
                         - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -2444,7 +2426,8 @@ class SubnetModule(BloxoneAnsibleModule):
         ]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = Subnet.from_dict(self._payload_params)
-        # Safely remove unwanted attributes
+
+        # Unset unsupported DHCP configuration attributes
         if self._payload.dhcp_config:
             self._payload.dhcp_config.abandoned_reclaim_time = None
             self._payload.dhcp_config.abandoned_reclaim_time_v6 = None
@@ -2591,8 +2574,6 @@ def main():
         dhcp_config=dict(
             type="dict",
             options=dict(
-                abandoned_reclaim_time=dict(type="int"),
-                abandoned_reclaim_time_v6=dict(type="int"),
                 allow_unknown=dict(type="bool"),
                 allow_unknown_v6=dict(type="bool"),
                 echo_client_id=dict(type="bool"),
