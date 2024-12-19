@@ -155,10 +155,6 @@ options:
                 description:
                     - "Disable to allow leases only for known IPV6 clients, those for which a fixed address is configured."
                 type: bool
-            echo_client_id:
-                description:
-                    - "Enable/disable to include/exclude the client id when responding to discover or request."
-                type: bool
             filters:
                 description:
                     - "The resource identifier."
@@ -974,11 +970,6 @@ item:
                 allow_unknown_v6:
                     description:
                         - "Disable to allow leases only for known IPV6 clients, those for which a fixed address is configured."
-                    type: bool
-                    returned: Always
-                echo_client_id:
-                    description:
-                        - "Enable/disable to include/exclude the client id when responding to discover or request."
                     type: bool
                     returned: Always
                 filters:
@@ -2368,9 +2359,6 @@ class AddressBlockModule(BloxoneAnsibleModule):
             "csp_url",
             "api_key",
             "id",
-            "abandoned_reclaim_time",
-            "abandoned_reclaim_time_v6",
-            "echo_client_id",
         ]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = AddressBlock.from_dict(self._payload_params)
@@ -2524,7 +2512,6 @@ def main():
             options=dict(
                 allow_unknown=dict(type="bool"),
                 allow_unknown_v6=dict(type="bool"),
-                echo_client_id=dict(type="bool"),
                 filters=dict(type="list", elements="str"),
                 filters_v6=dict(type="list", elements="str"),
                 ignore_client_uid=dict(type="bool"),
