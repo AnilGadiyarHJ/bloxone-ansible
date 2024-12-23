@@ -4,6 +4,7 @@ action_groups:
         extend_group:
           - ipam
           - dns
+          - infra
   dns:
     - dns_view
     - dns_view_info
@@ -23,6 +24,10 @@ action_groups:
     - ipam_subnet_info
     - ipam_address_block
     - ipam_address_block_info
+
+  infra:
+    - infra_join_token
+    - infra_join_token_info
 
 plugin_routing:
     modules:
