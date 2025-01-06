@@ -353,6 +353,28 @@ class HostModule(BloxoneAnsibleModule):
             if len(resp.results) == 0:
                 return None
 
+    # def find(self):
+    #     if self.params.get("id"):
+    #         try:
+    #             resp = HostApi(self.client).read(self.params["id"], inherit="full")
+    #             return resp.result
+    #         except NotFoundException as e:
+    #             if self.params["state"] == "absent":
+    #                 return None
+    #             raise e
+    #     elif self.params.get("server"):
+    #         filter = f"server=='{self.params['server']}'"
+    #         if self.params.get("absolute_name"):
+    #             filter += f" and absolute_name=='{self.params['absolute_name']}'"
+    #         resp = HostApi(self.client).list(filter=filter)
+    #         if len(resp.results) == 1:
+    #             return resp.results[0]
+    #         if len(resp.results) > 1:
+    #             self.fail_json(msg=f"Found multiple Hosts: {resp.results}")
+    #         return None
+    #     else:
+    #         self.fail_json(msg="Either 'id' or 'server' must be provided to locate the DNS host.")
+
     def create(self):
         if self.check_mode:
             return None
@@ -364,6 +386,7 @@ class HostModule(BloxoneAnsibleModule):
         if self.check_mode:
             return None
 
+        #self.fail_json(msg="Entered here")
         resp = HostApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
@@ -415,6 +438,7 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
+        absolute_name=dict(type="str"),
         associated_server=dict(type="dict", options=dict(
         )),
         inheritance_sources=dict(type="dict", options=dict(
@@ -441,3 +465,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+#dns host .py code
