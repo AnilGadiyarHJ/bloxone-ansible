@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dns_auth_nsg
 short_description: Manage AuthNsg
 description:
-    - Manage AuthNsg
+    - Manage AuthNSG
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
