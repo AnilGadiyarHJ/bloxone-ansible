@@ -204,7 +204,7 @@
           - "{{ forward_nsg.id }}"
         state: present
       register: secondary_forward_nsg
-    - name: Validate Secondary Forward NSG Creation
+    - name: Get Information about the Secondary Forward NSG Creation
       infoblox.bloxone.dns_forward_nsg_info:
         filters:
           name: "{{ forward_nsg_secondary_name }}"

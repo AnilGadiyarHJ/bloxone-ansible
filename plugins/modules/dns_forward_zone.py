@@ -109,7 +109,7 @@ EXAMPLES = r"""
       notify: true
       state: "present"
       tags:
-        location: "my-location"
+        location: "site-1"
 
   - name: Delete the Zone
     infoblox.bloxone.dns_forward_zone:
