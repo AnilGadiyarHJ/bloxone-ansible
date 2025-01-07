@@ -84,7 +84,23 @@ options:
         elements: dict
         suboptions:
             algorithm:
-                description: ""
+                description:
+                    - "DNSSEC trust anchor."
+                    - "Key algorithm. Algorithm values are as per standards. The mapping is as follows:"
+                    - "* I(RSAMD5) = 1,"
+                    - "* I(DH) = 2,"
+                    - "* I(DSA) = 3,"
+                    - "* I(RSASHA1) = 5,"
+                    - "* I(DSANSEC3SHA1) = 6,"
+                    - "* I(RSASHA1NSEC3SHA1) = 7,"
+                    - "* I(RSASHA256) = 8,"
+                    - "* I(RSASHA512) = 10,"
+                    - "* I(ECDSAP256SHA256) = 13,"
+                    - "* I(ECDSAP384SHA384) = 14."
+                    - "Below algorithms are deprecated and not supported anymore:"
+                    - "* I(RSAMD5) = 1,"
+                    - "* I(DSA) = 3,"
+                    - "* I(DSANSEC3SHA1) = 6."
                 type: int
             public_key:
                 description:
@@ -996,7 +1012,7 @@ EXAMPLES = r"""
         - address: "192.168.11.11"
           fqdn: "example.com."
       tags:
-        location: "my-location"
+        location: "site-1"
       comment: "Example DNS Server"
       state: "present"
 

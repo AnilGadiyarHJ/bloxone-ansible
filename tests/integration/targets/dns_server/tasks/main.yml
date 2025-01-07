@@ -109,7 +109,7 @@
           - dns_server_info.objects[0].id == dns_server.id
           - dns_server_info.objects[0].add_edns_option_in_outgoing_query == true
 
-    - name: Create a DNS Server with auto_sort_views enabled
+    - name: Create a DNS Server with Auto Sort Views enabled
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         auto_sort_views: true
@@ -144,11 +144,14 @@
           - dns_server_info.objects[0].comment == "test comment"
 
     - name: Create a DNS Server with Custom Root Nameservers
+      #tags: dns_server
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         custom_root_ns:
           - address: "192.168.10.10"
-            fqdn: "tf-example.com."
+            fqdn: "test-example.com."
+          - address: "192.168.10.11"
+            fqdn: "test-example2.com"
         state: present
       register: dns_server
     - name: Get Information about the DNS Server
@@ -161,7 +164,28 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].custom_root_ns[0].address == "192.168.10.10"
-          - dns_server_info.objects[0].custom_root_ns[0].fqdn == "tf-example.com."
+          - dns_server_info.objects[0].custom_root_ns[0].fqdn == "test-example.com."
+          - dns_server_info.objects[0].custom_root_ns[1].address == "192.168.10.11"
+          - dns_server_info.objects[0].custom_root_ns[1].fqdn == "test-example2.com."
+
+    - name: Create a DNS Server with Recursive Clients
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}"
+        recursive_clients: 100
+        state: present
+      register: dns_server
+    - name: Get Information about the DNS Server
+      infoblox.bloxone.dns_server_info:
+        filters:
+          name: "{{ dns_server_name }}"
+      register: dns_server_info
+    - name: Assert DNS Server Configuration
+      assert:
+        that:
+          - dns_server_info is not failed
+          - dns_server_info.objects | length == 1
+          - dns_server_info.objects[0].recursive_clients == 100
+
 
     - name: Create a DNS Server with Custom Root Nameservers Enabled
       infoblox.bloxone.dns_server:
@@ -169,7 +193,7 @@
         custom_root_ns_enabled: true
         custom_root_ns:
           - address: "192.168.10.10"
-            fqdn: "tf-example.com."
+            fqdn: "test-example.com."
         state: present
       register: dns_server
     - name: Get Information about the DNS Server
@@ -183,10 +207,11 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].custom_root_ns_enabled == true
 
-    - name: Create a DNS Server with DNSSEC Enable Validation (true)
+
+    - name: Create a DNS Server with DNSSEC Enable Validation (false)
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
-        dnssec_enable_validation: true
+        dnssec_enable_validation: false
         state: present
       register: dns_server
     - name: Get Information about the DNS Server
@@ -198,12 +223,12 @@
         that:
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
-          - dns_server_info.objects[0].dnssec_enable_validation == true
+          - dns_server_info.objects[0].dnssec_enable_validation == false
 
-    - name: Create a DNS Server with DNSSEC Enabled (true)
+    - name: Create a DNS Server with DNSSEC Enabled (false)
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
-        dnssec_enabled: true
+        dnssec_enabled: false
         state: present
       register: dns_server
     - name: Get Information about the DNS Server
@@ -214,7 +239,7 @@
     - assert:
         that:
           - dns_server_info.objects | length == 1
-          - dns_server_info.objects[0].dnssec_enabled == true
+          - dns_server_info.objects[0].dnssec_enabled == false
 
     - name: Create DNS Server with DNSSEC Trust Anchors
       infoblox.bloxone.dns_server:
@@ -222,7 +247,7 @@
         dnssec_trust_anchors:
           - algorithm: "8"
             public_key: "AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexTBAvkMgJzkKTOiW1vkIbzxeF3+/4RgWOq7HrxRixHlFlExOLAJr5emLvN7SWXgnLh4+B5xQlNVz8Og8kvArMtNROxVQuCaSnIDdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLrjyBxWezF0jLHwVN8efS3rCj/EWgvIWgb9tarpVUDK/b58Da+sqqls3eNbuv7pr+eoZG+SrDK6nWeL3c6H5Apxz7LjVc1uTIdsIXxuOLYA4/ilBmSVIzuDWfdRUfhHdY6+cn8HFRm+2hM8AnXGXws9555KrUB5qihylGa8subX2Nn6UwNR1AkUTV74bU="
-            zone: "tf-infoblox.com."
+            zone: "test-infoblox.com."
             sep: true
         state: present
       register: dns_server
@@ -236,7 +261,7 @@
         that:
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].dnssec_trust_anchors[0].algorithm == 8
-          - dns_server_info.objects[0].dnssec_trust_anchors[0].zone == "tf-infoblox.com."
+          - dns_server_info.objects[0].dnssec_trust_anchors[0].zone == "test-infoblox.com."
           - dns_server_info.objects[0].dnssec_trust_anchors[0].sep == true  # Ensure 'sep' is false
 
     - name: Create a DNS Server with DNSSEC Validate Expiry enabled
@@ -262,7 +287,7 @@
         ecs_enabled: true
         ecs_zones:
           - access: "allow"
-            fqdn: "tf-infoblox.com."
+            fqdn: "test-infoblox.com."
         state: present
       register: dns_server
     - name: Get Information about the DNS Server
@@ -334,10 +359,9 @@
         name: "{{ dns_server_name }}"
         ecs_zones:
           - access: "allow"
-            fqdn: "tf-infoblox.com."
+            fqdn: "test-infoblox.com."
         state: present
       register: dns_server
-        # Step 2: Get DNS server details
     - name: Get DNS server details
       infoblox.bloxone.dns_server_info:
         filters:
@@ -349,9 +373,9 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].ecs_zones[0].access == "allow"
-          - dns_server_info.objects[0].ecs_zones[0].fqdn == "tf-infoblox.com."
+          - dns_server_info.objects[0].ecs_zones[0].fqdn == "test-infoblox.com."
 
-    - name: Create a DNS server with filter_aaaa_on_v4
+    - name: Create a DNS server with Filter_AAAA_On_V4
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         filter_aaaa_on_v4: "break_dnssec"
@@ -369,12 +393,30 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].filter_aaaa_on_v4 == "break_dnssec"
 
-    - name: Create a DNS server with forwarders
+    - name: Create a DNS server with Filter_AAAA_On_V4 as yes
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}"
+        filter_aaaa_on_v4: "yes"
+        state: present
+      register: dns_server
+    - name: Get DNS server details
+      infoblox.bloxone.dns_server_info:
+        filters:
+          name: "{{ dns_server_name }}"
+      register: dns_server_info
+    - name: Assert the DNS server exists and has the correct yes
+      assert:
+        that:
+          - dns_server_info is not failed
+          - dns_server_info.objects | length == 1
+          - dns_server_info.objects[0].filter_aaaa_on_v4 == "yes"
+
+    - name: Create a DNS server with Forwarders
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         forwarders:
           - address: "192.168.10.10"
-            fqdn: "tf-example.com."
+            fqdn: "test-example.com."
         state: present
       register: dns_server
     - name: Get DNS server details
@@ -388,15 +430,15 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].forwarders[0].address == "192.168.10.10"
-          - dns_server_info.objects[0].forwarders[0].fqdn == "tf-example.com."
+          - dns_server_info.objects[0].forwarders[0].fqdn == "test-example.com."
 
-    - name: Create a DNS server with forwarders_only set to true
+    - name: Create a DNS server with Forwarders_only set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         forwarders_only: true
         forwarders:
           - address: "192.168.11.11"
-            fqdn: "tf-infoblox.com."
+            fqdn: "test-infoblox.com."
         state: present
       register: dns_server
     - name: Get DNS server details
@@ -411,9 +453,9 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].forwarders_only == true
           - dns_server_info.objects[0].forwarders[0].address == "192.168.11.11"
-          - dns_server_info.objects[0].forwarders[0].fqdn == "tf-infoblox.com."
+          - dns_server_info.objects[0].forwarders[0].fqdn == "test-infoblox.com."
 
-    - name: Create a DNS server with gss_tsig_enabled set to false
+    - name: Create a DNS server with Gss_Tsig_Enabled set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         gss_tsig_enabled: true
@@ -431,7 +473,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].gss_tsig_enabled == true
 
-    - name: Create a DNS server with inheritance sources action set to inherit
+    - name: Create a DNS server with Inheritance sources action set to inherit
       infoblox.bloxone.dns_server:
         name: "dns-server-example"
         inheritance_sources:
@@ -523,7 +565,7 @@
           - dns_server_info.objects[0].inheritance_sources.transfer_acl.action == "inherit"
           - dns_server_info.objects[0].inheritance_sources.use_forwarders_for_subzones.action == "inherit"
 
-    - name: Create a DNS server with lame_ttl set to 3000
+    - name: Create a DNS server with Lame_TTL set to 3000
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         lame_ttl: 3000
@@ -541,7 +583,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].lame_ttl == 3000
 
-    - name: Create a DNS server with log_query_response set to true
+    - name: Create a DNS server with Log_Query_Response set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         log_query_response: true
@@ -559,7 +601,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].log_query_response == true
 
-    - name: Create a DNS server with match_recursive_only set to true
+    - name: Create a DNS server with Match_Recursive_Only set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         match_recursive_only: true
@@ -577,7 +619,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].match_recursive_only == true
 
-    - name: Create a DNS server with max_cache_ttl set to 600000
+    - name: Create a DNS server with Max_Cache_TTL
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         max_cache_ttl: 600000
@@ -595,7 +637,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].max_cache_ttl == 600000
 
-    - name: Create a DNS server with max_negative_ttl set to 10000
+    - name: Create a DNS server with Max_Negative_TTL
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         max_negative_ttl: 10000
@@ -613,7 +655,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].max_negative_ttl == 10000
 
-    - name: Create a DNS server with minimal_responses set to false
+    - name: Create a DNS server with Minimal_Responses set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         minimal_responses: true
@@ -630,8 +672,26 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].minimal_responses == true
+          -
+    - name: update a DNS server name
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}_update"
+        minimal_responses: true
+        state: present
+      register: dns_server
+    - name: Get DNS server details
+      infoblox.bloxone.dns_server_info:
+        filters:
+          name: "{{ dns_server_name }}_update"
+      register: dns_server_info
+    - name: Assert the DNS server exists and has the correct minimal_responses setting
+      assert:
+        that:
+          - dns_server_info is not failed
+          - dns_server_info.objects | length == 1
+          - dns_server_info.objects[0].name == "{{ dns_server_name }}_update"
 
-    - name: Create a DNS server with notify set to false
+    - name: Create a DNS server with Notify set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         notify: true
@@ -649,25 +709,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].notify == true
 
-    - name: Create a DNS server with notify set to false
-      infoblox.bloxone.dns_server:
-        name: "{{ dns_server_name }}"
-        notify: true
-        state: present
-      register: dns_server
-    - name: Get DNS server details
-      infoblox.bloxone.dns_server_info:
-        filters:
-          name: "{{ dns_server_name }}"
-      register: dns_server_info
-    - name: Assert the DNS server exists and has the correct notify setting
-      assert:
-        that:
-          - dns_server_info is not failed
-          - dns_server_info.objects | length == 1
-          - dns_server_info.objects[0].notify == true
-
-    - name: Create a DNS server with recursion_enabled set to true
+    - name: Create a DNS server with Recursion_Enabled set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         recursion_enabled: true
@@ -685,25 +727,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].recursion_enabled == true
 
-    - name: Create a DNS server with recursion_enabled set to true
-      infoblox.bloxone.dns_server:
-        name: "{{ dns_server_name }}"
-        recursion_enabled: true
-        state: present
-      register: dns_server
-    - name: Get DNS server details
-      infoblox.bloxone.dns_server_info:
-        filters:
-          name: "{{ dns_server_name }}"
-      register: dns_server_info
-    - name: Assert the DNS server exists and has the correct recursion_enabled setting
-      assert:
-        that:
-          - dns_server_info is not failed
-          - dns_server_info.objects | length == 1
-          - dns_server_info.objects[0].recursion_enabled == true
-
-    - name: Create a DNS server with resolver_query_timeout set to 15
+    - name: Create a DNS server with Resolver_Query_Timeout set to 15
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         resolver_query_timeout: 15
@@ -721,7 +745,25 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].resolver_query_timeout == 15
 
-    - name: Create a DNS server with secondary_axfr_query_limit set to 2
+    - name: Create a DNS Server with Query Port
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}"
+        query_port: 2
+        state: present
+      register: dns_server
+    - name: Get Information about the DNS Server
+      infoblox.bloxone.dns_server_info:
+        filters:
+          name: "{{ dns_server_name }}"
+      register: dns_server_info
+    - name: Assert DNS Server Query Port Configuration
+      assert:
+        that:
+          - dns_server_info is not failed
+          - dns_server_info.objects | length == 1
+          - dns_server_info.objects[0].query_port == 2
+
+    - name: Create a DNS server with Secondary_Axfr_Query_Limit
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         secondary_axfr_query_limit: 2
@@ -739,7 +781,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].secondary_axfr_query_limit == 2
 
-    - name: Create a DNS server with secondary_soa_query_limit set to 2
+    - name: Create a DNS server with Secondary_Soa_Query_Limit
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         secondary_soa_query_limit: 2
@@ -757,7 +799,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].secondary_soa_query_limit == 2
 
-    - name: Create a DNS server with sort_list configuration
+    - name: Create a DNS server with Sort_List configuration
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         sort_list:
@@ -781,7 +823,30 @@
           - dns_server_info.objects[0].sort_list[0].source == "192.168.11.11"
           - dns_server_info.objects[0].sort_list[0].prioritized_networks[0] == "192.168.12.12"
 
-    - name: Create a DNS server with synthesize_address_records_from_https set to false
+    - name: Create a DNS server with Sort_List configuration with element as any
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}"
+        sort_list:
+          - element: any
+            prioritized_networks:
+              - "192.168.12.13"
+        state: present
+      register: dns_server
+    - name: Get DNS server details
+      infoblox.bloxone.dns_server_info:
+        filters:
+          name: "{{ dns_server_name }}"
+      register: dns_server_info
+    - name: Assert the DNS server exists and has the correct sort_list configuration
+      assert:
+        that:
+          - dns_server_info is not failed
+          - dns_server_info.objects | length == 1
+          - dns_server_info.objects[0].sort_list[0].element == "any"
+          - dns_server_info.objects[0].sort_list[0].prioritized_networks[0] == "192.168.12.13"
+
+
+    - name: Create a DNS server with Synthesize_Address_Records_From_Https set to false
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         synthesize_address_records_from_https: true
@@ -799,7 +864,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].synthesize_address_records_from_https == true
 
-    - name: Create a DNS server with tags tag1 and tag2
+    - name: Create a DNS server with Tags
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         tags:
@@ -820,7 +885,7 @@
           - dns_server_info.objects[0].tags.tag1 == "value1"
           - dns_server_info.objects[0].tags.tag2 == "value2"
 
-    - name: Create a DNS server with use_forwarders_for_subzones set to true
+    - name: Create a DNS server with Use_Forwarders_For_Subzones set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         use_forwarders_for_subzones: true
@@ -838,13 +903,13 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].use_forwarders_for_subzones == true
 
-    - name: Create a DNS server with use_root_forwarders_for_local_resolution_with_b1td set to true
+    - name: Create a DNS server with Use_Root_Forwarders_For_Local_Resolution_With_B1td set to true
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         use_root_forwarders_for_local_resolution_with_b1td: true
         forwarders:
           - address: "192.168.11.11"
-            fqdn: "tf-infoblox.com."
+            fqdn: "test-infoblox.com."
         state: present
       register: dns_server
     - name: Get DNS server details
@@ -864,5 +929,11 @@
     - name: "Delete Dns Server"
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete Dns Server Update"
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}_update"
         state: "absent"
       ignore_errors: true

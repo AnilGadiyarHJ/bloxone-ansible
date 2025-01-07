@@ -28,7 +28,7 @@
         state: present
       register: dns_server
 
-    - name: Get Information about the DNS Server
+    - name: Get Information about the DNS Server by filter (name)
       infoblox.bloxone.dns_server_info:
         filters:
           name: "{{ dns_server_name }}"
@@ -56,7 +56,6 @@
         that:
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].id == dns_server.id
-
 
   always:
     - name: "Delete dns server"

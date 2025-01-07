@@ -61,7 +61,7 @@ EXAMPLES = r"""
     infoblox.bloxone.dns_server_info:
       id: "{{ dns_server_id }}"
 
-  - name: Get DNS Server information by filters (e.g., name)
+  - name: Get DNS Server information by filters (e.g. name)
     infoblox.bloxone.dns_server_info:
       filters:
         name: "example_server"
