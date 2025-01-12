@@ -54,7 +54,7 @@ EXAMPLES = r"""
     - name: Get Forward NSG information by filters (e.g. name)
       infoblox.bloxone.dns_forward_nsg_info:
         filters:
-        name: "example_nsg"
+          name: "example_nsg"
             
     - name: Get Forward NSG information by raw filter query
       infoblox.bloxone.dns_forward_nsg_info:
