@@ -1,0 +1,14 @@
+---
+- module_defaults:
+    group/infoblox.bloxone.all:
+      csp_url: "{{ csp_url }}"
+      api_key: "{{ api_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        dns_server_name: "-dns-server-{{ 999999 | random | string }}"
+
+    - name: Create a DNS Server
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}"
+        state: present
+      register: _dns_server
