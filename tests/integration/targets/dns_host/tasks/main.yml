@@ -1,10 +1,4 @@
 ---
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - Forward Zone with Hosts
-# - Forward Zone with Internal Forwarders
-# - Forward Zone with NSGs
--
 - module_defaults:
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
@@ -14,7 +8,7 @@
     - ansible.builtin.set_fact:
         fqdn: "fw-zone-{{ 999999 | random | string }}.com."
         host_display_name: "test_infra_host_anil"
-        absolute_name: "test_dns_host_01."
+        absolute_name: "test_dns_host_name-{{ 999999 | random | string }}."
         dns_server_name: "-dns-server-{{ 999999 | random | string }}"
 
     - name: Retrieve Infra Host Information
@@ -44,32 +38,121 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
 
-#    - name: Simulate DNS Host Creation (Check Mode)
-#      infoblox.bloxone.dns_host:
-#        id: "{{ infra_host_info.objects[0].legacy_id }}"
-#        absolute_name: "{{ absolute_name }}"
-#        server: "{{ dns_server_info.objects[0].id }}"
-#        state: present
-#      check_mode: true
-#      register: dns_host
-#    - name: Assert Check Mode Simulated Changes
-#      assert:
-#        that:
-#          - dns_host is changed
-#        fail_msg: "DNS Host '{{ absolute_name }}' did not simulate creation properly."
-
-    - name: Retrieve the Existing DNS Host
-      infoblox.bloxone.infra_host_info:
+    - name: create DNS Host Creation (Check Mode)
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        absolute_name: "{{ absolute_name }}"
+        server: "{{ dns_server_info.objects[0].id }}"
+        state: present
+      check_mode: true
+      register: dns_host
+    - name: Get DNS Host Information
+      infoblox.bloxone.dns_host_info:
         filters:
-          display_name: "ZTP_jt_yg_6002105851565412243"
+          absolute_name: "{{ absolute_name }}"
       register: dns_host_info
+    - name: Assert DNS Host Creation
+      assert:
+        that:
+          - dns_host is changed
+          - dns_host.failed == false
+          - dns_host_info.objects | length == 0
+
+    - name: create DNS Host Creation
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        absolute_name: "{{ absolute_name }}"
+        server: "{{ dns_server_info.objects[0].id }}"
+        state: present
+      register: dns_host
+    - name: Get DNS Host Information
+      infoblox.bloxone.dns_host_info:
+        filters:
+          absolute_name: "{{ absolute_name }}"
+      register: dns_host_info
+    - name: Assert DNS Host Creation
+      assert:
+        that:
+          - dns_host is changed
+          - dns_host_info is not failed
+          - dns_host_info.objects | length == 1
+
+    - name: create DNS Host Creation (idempotent)
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        absolute_name: "{{ absolute_name }}"
+        server: "{{ dns_server_info.objects[0].id }}"
+        state: present
+      register: dns_host
+    - assert:
+        that:
+          - dns_host is not changed
+          - dns_host is not failed
+
+    - name: Delete the DNS Host (Check Mode)
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        state: absent
+      check_mode: true
+      register: dns_host
+      failed_when: false
+    - name: Get DNS Host Information
+      infoblox.bloxone.dns_host_info:
+        filters:
+          absolute_name: "{{ absolute_name }}"
+      register: dns_host_info
+    - name: Assert that Deletion Failed
+      assert:
+        that:
+          - dns_host is changed
+          - dns_host_info is not failed
+
+    - name: Delete the DNS Host
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        state: absent
+      register: dns_host
+      failed_when: false
+    - name: Assert that Deletion Failed
+      assert:
+        that:
+          - "'msg' in dns_host"
+          - "'MODULE FAILURE' in dns_host.msg"
+          - "'delete' not in dns_host.msg"
+        fail_msg: "The DNS host deletion was expected to fail due to missing 'delete' method, but it succeeded."
+        success_msg: "The DNS host deletion failed as expected."
+
     - name: update absoule name for DNS Host
       infoblox.bloxone.dns_host:
-       absolute_name: "{{ absolute_name }}"
-       id: "{{ dns_host_info.objects[0].legacy_id }}"
+       absolute_name: "test_dns_host_name_updated."
+       id: "{{ infra_host_info.objects[0].legacy_id }}"
        server: "{{ dns_server_info.objects[0].id }}"
        state: present
       register: dns_host
+    - name: Get DNS Host Information
+      infoblox.bloxone.dns_host_info:
+        filters:
+          absolute_name: "test_dns_host_name_updated."
+      register: dns_host_info
+    - name: Assert DNS Host Exists
+      assert:
+        that:
+          - dns_host is changed
+          - dns_host_info is not failed
+          - dns_host_info.objects | length == 1
+
+    - name: update server for DNS Host
+      infoblox.bloxone.dns_host:
+       absolute_name: "test_dns_host_name_updated."
+       id: "{{ infra_host_info.objects[0].legacy_id }}"
+       server: "{{ dns_server_info.objects[0].id }}"
+       state: present
+      register: dns_host
+    - name: Get DNS Host Information
+      infoblox.bloxone.dns_host_info:
+        filters:
+          absolute_name: "test_dns_host_name_updated."
+      register: dns_host_info
     - name: Assert DNS Host Exists
       assert:
         that:
