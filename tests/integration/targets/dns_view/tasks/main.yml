@@ -8,7 +8,6 @@
     - ansible.builtin.set_fact:
         name: "test-view-{{ 999999 | random | string }}"
 
-
     - name: Create a View (check mode)
       infoblox.bloxone.dns_view:
         name: "{{ name }}"
