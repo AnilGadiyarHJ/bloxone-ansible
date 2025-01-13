@@ -1,0 +1,11 @@
+---
+- module_defaults:
+    group/infoblox.bloxone.all:
+      csp_url: "{{ csp_url }}"
+      api_key: "{{ api_key }}"
+  block:
+    - name: "Delete an Auth Zone"
+      infoblox.bloxone.dns_auth_zone:
+        fqdn: "{{ _fqdn_auth_zone }}"
+        state: "absent"
+      ignore_errors: true
