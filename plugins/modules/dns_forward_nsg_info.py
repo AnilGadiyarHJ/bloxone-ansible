@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_forward_nsg_info
-short_description: Manage ForwardNsg
+short_description: Manage Forward NSG
 description:
-    - Manage ForwardNsg
+    - Manage Forward NSG
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
