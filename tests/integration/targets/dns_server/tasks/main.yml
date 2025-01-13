@@ -144,7 +144,6 @@
           - dns_server_info.objects[0].comment == "test comment"
 
     - name: Create a DNS Server with Custom Root Nameservers
-      #tags: dns_server
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         custom_root_ns:
@@ -262,7 +261,7 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].dnssec_trust_anchors[0].algorithm == 8
           - dns_server_info.objects[0].dnssec_trust_anchors[0].zone == "test-infoblox.com."
-          - dns_server_info.objects[0].dnssec_trust_anchors[0].sep == true  # Ensure 'sep' is false
+          - dns_server_info.objects[0].dnssec_trust_anchors[0].sep == true
 
     - name: Create a DNS Server with DNSSEC Validate Expiry enabled
       infoblox.bloxone.dns_server:
