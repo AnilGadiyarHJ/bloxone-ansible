@@ -56,6 +56,21 @@ extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Get DNS Host information by ID
+      infoblox.bloxone.dns_host_info:
+        id: "{{ dns_host_id }}"
+
+    - name: Get DNS Host information by filters (e.g., absolute_name)
+      infoblox.bloxone.dns_host_info:
+        filters:
+          absolute_name: "example_host"
+
+    - name: Get DNS Host information by raw filter query
+      infoblox.bloxone.dns_host_info:
+        filter_query: "absolute_name=='example_host'"
+"""
+
 RETURN = r"""
 id:
     description:

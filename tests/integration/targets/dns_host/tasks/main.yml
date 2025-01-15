@@ -132,7 +132,7 @@
           display_name: "{{ host_display_name2 }}"
       register: infra_host_info_2
 
-    - name: update server for DNS Host
+    - name: update server name for DNS Host
       infoblox.bloxone.dns_host:
        absolute_name: "{{ absolute_name }}"
        id: "{{ infra_host_info_2.objects[0].legacy_id }}"
@@ -168,8 +168,13 @@
         state: "present"
       ignore_errors: true
 
-#    - name: "Delete Dns Server"
-#      infoblox.bloxone.dns_server:
-#        name: "{{ _dns_server.name }}"
-#        state: "absent"
-#      ignore_errors: true
+    # Cleanup if the test fails
+    - ansible.builtin.include_role:
+        name: setup_dns_server
+        tasks_from: cleanup.yml
+
+    - name: "Delete Dns Server2"
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}_new"
+        state: "absent"
+      ignore_errors: true

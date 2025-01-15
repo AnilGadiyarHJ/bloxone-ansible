@@ -5,7 +5,6 @@
 # - tsig keys
 # - acl
 
-
 - module_defaults:
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"

@@ -30,6 +30,11 @@ options:
             - present
             - absent
         default: present
+    absolute_name:
+        description:
+            - "The fully qualified domain name (FQDN) of the DNS host."
+        type: str
+        required: false
     associated_server:
         description:
             - "Host associated server configuration."
@@ -72,6 +77,20 @@ options:
 extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
+
+EXAMPLES = r"""
+    - name: update DNS Host Creation
+      infoblox.bloxone.dns_host:
+        id: "dns/host/607548"
+        absolute_name: "example_server_name"
+        server: "dns/server/dffe17f4-cc62-49f1-832c-31f4fb29c9ba"
+        state: present
+
+    - name: Delete the DNS Server
+      infoblox.bloxone.dns_server:
+        name: "example_server_name"
+        state: "absent"
+"""
 
 RETURN = r"""
 id:
@@ -421,11 +440,11 @@ def main():
         inheritance_sources=dict(type="dict", options=dict(
             kerberos_keys=dict(type="dict", options=dict(
                 action=dict(type="str"),
-            )),
+            ), no_log=True),
         )),
         kerberos_keys=dict(type="list", elements="dict", options=dict(
-            key=dict(type="str"),
-        )),
+            key=dict(type="str", no_log=True),
+        ), no_log=True),
         server=dict(type="str"),
         tags=dict(type="dict"),
 
