@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: tsig_key_info
-short_description: Manage Tsig
+short_description: Manage TSIG Key
 description:
-    - Manage Tsig
+    - Manage TSIG Key
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -222,7 +222,6 @@ def main():
         id=dict(type="str", required=False),
         filters=dict(type="dict", required=False),
         filter_query=dict(type="str", required=False),
-        inherit=dict(type="str", required=False, choices=["full", "partial", "none"], default="full"),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )

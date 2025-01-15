@@ -34,7 +34,6 @@
       infoblox.bloxone.tsig_key_info:
         filters:
           name: "{{ tsig_key_name }}"
-          algorithm: "{{ tsig_key_algorithm }}"
       register: tsig_key_info
     - assert:
         that:

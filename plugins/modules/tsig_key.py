@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: tsig_key
-short_description: Manage Tsig
+short_description: Manage TSIG Key
 description:
-    - Manage Tsig
+    - Manage TSIG Key
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -77,7 +77,7 @@ EXAMPLES = r"""
     algorithm: "hmac_sha51"
     state: present
     tags:
-      location: "my-location"
+      location: "site-1"
 
 - name: Delete TSIG Key
   infoblox.bloxone.tsig_key:
@@ -155,7 +155,7 @@ from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import Bl
 
 try:
     from bloxone_client import ApiException, NotFoundException
-    from keys import TsigApi, TSIGKey
+    from keys import TsigApi, TSIGKey, GenerateTsigApi
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
@@ -168,6 +168,8 @@ class TsigModule(BloxoneAnsibleModule):
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = TSIGKey.from_dict(self._payload_params)
         self._existing = None
+        self.secret = None
+        self.algorithm = None
 
     @property
     def existing(self):
@@ -214,6 +216,16 @@ class TsigModule(BloxoneAnsibleModule):
     def create(self):
         if self.check_mode:
             return None
+
+        # Generate secret dynamically if not provided
+        if self.secret is None:
+            api_res = GenerateTsigApi(self.client).generate_tsig(algorithm=self.algorithm)
+            if not api_res.success:
+                self.module.fail_json(msg=f"Failed to generate TSIG secret: {api_res.error}")
+            self.secret = api_res.result.get("secret")
+
+        # Include generated secret in the payload
+        self.payload["secret"] = self.secret
 
         resp = TsigApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
@@ -275,10 +287,10 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        algorithm=dict(type="str"),
+        algorithm=dict(type="str", default="hmac_sha512"),
         comment=dict(type="str"),
-        name=dict(type="str"),
-        secret=dict(type="str", no_log=True),
+        name=dict(type="str", required=True),
+        secret=dict(type="str", no_log=True, default="secret"),
         tags=dict(type="dict"),
     )
 
@@ -289,7 +301,6 @@ def main():
     )
 
     module.run_command()
-
 
 if __name__ == "__main__":
     main()
