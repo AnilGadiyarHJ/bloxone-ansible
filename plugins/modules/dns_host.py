@@ -39,7 +39,6 @@ options:
         description:
             - "Host associated server configuration."
         type: dict
-        suboptions:
     inheritance_sources:
         description:
             - "Optional. Inheritance configuration."
