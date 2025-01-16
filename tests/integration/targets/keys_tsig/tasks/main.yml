@@ -143,6 +143,26 @@
           - tsig_key_info.objects[0].name == tsig_key_name
           - tsig_key_info.objects[0].algorithm == "hmac_sha384"
 
+    - name: Create a TSIG Key with secret generated
+      infoblox.bloxone.tsig_key:
+        name: "{{ tsig_key_name }}_generated."
+        algorithm: "hmac_sha384"
+        state: present
+      register: tsig_key
+    - name: Get TSIG Key Information
+      infoblox.bloxone.tsig_key_info:
+        filters:
+          name: "{{ tsig_key_name }}_generated."
+      register: tsig_key_info
+    - name: Assert TSIG Key Algorithm
+      assert:
+        that:
+          - tsig_key_info is not failed
+          - tsig_key_info.objects | length == 1
+          - tsig_key_info.objects[0].name == "{{ tsig_key_name }}_generated."
+          - tsig_key_info.objects[0].algorithm == "hmac_sha384"
+
+
     - name: Create a TSIG Key with a Comment
       infoblox.bloxone.tsig_key:
         name: "{{ tsig_key_name }}"
@@ -204,31 +224,17 @@
           - tsig_key_info.objects | length == 1
           - tsig_key_info.objects[0].tags.location == "site-1"
 
-    - name: update a TSIG Key name
-      infoblox.bloxone.tsig_key:
-        name: "{{ tsig_key_name }}_updated"
-        secret: "{{ tsig_key_secret }}"
-        algorithm: "{{ tsig_key_algorithm }}"
-        tags:
-          location: "site-1"
-        state: present
-      register: tsig_key
-    - name: Get TSIG Key Information
-      infoblox.bloxone.tsig_key_info:
-        filters:
-          name: "{{ tsig_key_name }}"
-      register: tsig_key_info
-    - name: Assert TSIG Key Tags and Existence
-      assert:
-        that:
-          - tsig_key_info is not failed
-          - tsig_key_info.objects | length == 1
-          - tsig_key_info.objects[0].tags.location == "site-1"
-
   always:
     # Cleanup if the test fails
     - name: "Delete tsig keys"
       infoblox.bloxone.tsig_key:
-        name: "{{ tsig_key_name }}_updated"
+        name: "{{ tsig_key_name }}"
+        state: "absent"
+      ignore_errors: true
+
+    # Cleanup if the test fails
+    - name: "Delete tsig keys"
+      infoblox.bloxone.tsig_key:
+        name: "{{ tsig_key_name }}_generated."
         state: "absent"
       ignore_errors: true

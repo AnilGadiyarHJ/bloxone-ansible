@@ -168,8 +168,9 @@ class TsigModule(BloxoneAnsibleModule):
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = TSIGKey.from_dict(self._payload_params)
         self._existing = None
-        self.secret = None
-        self.algorithm = None
+
+        # self.secret = None
+        # self.algorithm = None
 
     @property
     def existing(self):
@@ -213,20 +214,43 @@ class TsigModule(BloxoneAnsibleModule):
             if len(resp.results) == 0:
                 return None
 
+    # def create(self):
+    #     if self.check_mode:
+    #         self.fail_json(msg=f"Params: {self.check_mode}")
+    #         return None
+    #
+    #     # # Debug the value of `secret`
+    #     # self.fail_json(msg=f"Secret Parameter: {self.params['secret']}")
+    #     #self.fail_json(msg=f"Params: {self.params}")
+    #     # Generate secret dynamically if not provided
+    #     # if self.params["secret"] is None:
+    #     #     self.fail_json(msg=f"entered")
+    #     api_res = GenerateTsigApi(self.client).generate_tsig(algorithm=self.params["algorithm"])
+    #
+    #     if api_res is None:
+    #         self.module.fail_json(msg=f"Failed to generate TSIG secret: {api_res.error}")
+    #     self.payload.secret = getattr(api_res.result, "secret")  # api_res.result.("secret")
+    #
+    #     # Include generated secret in the payload
+    #     # self.payload["secret"] = secret
+    #
+    #     resp = TsigApi(self.client).create(body=self.payload)
+    #     self.fail_json(msg=f"API Response: {resp}")
+    #     return resp.result.model_dump(by_alias=True, exclude_none=True)
+
     def create(self):
         if self.check_mode:
             return None
 
-        # Generate secret dynamically if not provided
-        if self.secret is None:
-            api_res = GenerateTsigApi(self.client).generate_tsig(algorithm=self.algorithm)
-            if not api_res.success:
-                self.module.fail_json(msg=f"Failed to generate TSIG secret: {api_res.error}")
-            self.secret = api_res.result.get("secret")
+        if self.params["secret"] is None:
+            # Generate secret dynamically
+            api_res = GenerateTsigApi(self.client).generate_tsig(algorithm=self.params["algorithm"])
+            if api_res is None:
+                self.fail_json(msg="Failed to generate TSIG secret.")
+            # Extract and set the secret
+            self.payload.secret = api_res.result.secret
 
-        # Include generated secret in the payload
-        self.payload["secret"] = self.secret
-
+        # Perform the create operation
         resp = TsigApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
@@ -290,7 +314,7 @@ def main():
         algorithm=dict(type="str", default="hmac_sha512"),
         comment=dict(type="str"),
         name=dict(type="str", required=True),
-        secret=dict(type="str", no_log=True, default="secret"),
+        secret=dict(type="str", no_log=False, required=False),
         tags=dict(type="dict"),
     )
 
@@ -301,6 +325,7 @@ def main():
     )
 
     module.run_command()
+
 
 if __name__ == "__main__":
     main()
