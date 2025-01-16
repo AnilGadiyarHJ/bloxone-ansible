@@ -9,10 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: dns_delegation_info
-short_description: Manage Delegation
+module: ipam_host_info
+short_description: Manage IpamHost
 description:
-    - Manage Delegation
+    - Manage IpamHost
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -47,105 +47,126 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get Information about the Delegation
-      infoblox.bloxone.dns_delegation_info:
-        id: '{{ delegation_fqdn_id }}'
-        
-    - name: Get Delegation information by filters (e.g. fqdn)
-      infoblox.bloxone.dns_delegation_info:
-        filters:
-          fqdn: "delegation.example_zone."
-          
-    - name: Get Delegation information by filters (e.g. fqdn)
-      infoblox.bloxone.dns_delegation_info:
-        filters:
-          fqdn: "delegation.example_zone."
+    - name: Get Host information by ID
+      infoblox.bloxone.ipam_host_info:
+        id: "{{ host.id }}"
 
-    - name: Get Delegation information by raw filter query
-      infoblox.bloxone.dns_delegation_info:
-        filter_query: fqdn=='delegation.example_zone'
-        
-    - name: Get Delegation information by tag filters
-      infoblox.bloxone.dns_delegation_info:
+    - name: Get Host information by filters
+      infoblox.bloxone.ipam_host_info:
+        filters:
+          name: "example_host"
+
+    - name: Get Host information by filter query
+      infoblox.bloxone.ipam_host_info:
+        filter_query: "name=='example_host'"
+
+    - name: Get Host information by tag filters
+      infoblox.bloxone.ipam_host_info:
         tag_filters:
-          location: site-1  
-"""  # noqa: E501
+            location: "site-1"
+"""
 
 RETURN = r"""
 id:
     description:
-        - ID of the Delegation object
+        - ID of the IpamHost object
     type: str
     returned: Always
 objects:
     description:
-        - Delegation object
+        - IpamHost object
     type: list
     elements: dict
     returned: Always
     contains:
-        comment:
+        addresses:
             description:
-                - "Optional. Comment for zone delegation."
-            type: str
-            returned: Always
-        delegation_servers:
-            description:
-                - "Required. DNS zone delegation servers. Order is not significant."
+                - "The list of all addresses associated with the IPAM host, which may be in different IP spaces."
             type: list
             returned: Always
             elements: dict
             contains:
                 address:
                     description:
-                        - "Optional. IP Address of nameserver."
-                        - "Only required when fqdn of a delegation server falls under delegation fqdn"
+                        - "Field usage depends on the operation:"
+                        - "* For read operation, I(address) of the I(Address) corresponding to the I(ref) resource."
+                        - "* For write operation, I(address) to be created if the I(Address) does not exist. Required if I(ref) is not set on write:"
+                        - "* If the I(Address) already exists and is already pointing to the right I(Host), the operation proceeds."
+                        - "* If the I(Address) already exists and is pointing to a different _Host, the operation must abort."
+                        - "* If the I(Address) already exists and is not pointing to any I(Host), it is linked to the I(Host)."
                     type: str
                     returned: Always
-                fqdn:
+                ref:
                     description:
-                        - "Required. FQDN of nameserver."
+                        - "The resource identifier."
                     type: str
                     returned: Always
-                protocol_fqdn:
+                space:
                     description:
-                        - "FQDN of nameserver in punycode."
+                        - "The resource identifier."
                     type: str
                     returned: Always
-        disabled:
+        auto_generate_records:
             description:
-                - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating resource records."
+                - "This flag specifies if resource records have to be auto generated for the host."
             type: bool
             returned: Always
-        fqdn:
+        comment:
             description:
-                - "Delegation FQDN. The FQDN supplied at creation will be converted to canonical form."
-                - "Read-only after creation."
+                - "The description for the IPAM host. May contain 0 to 1024 characters. Can include UTF-8."
             type: str
             returned: Always
+        created_at:
+            description:
+                - "Time when the object has been created."
+            type: str
+            returned: Always
+        host_names:
+            description:
+                - "The name records to be generated for the host."
+                - "This field is required if I(auto_generate_records) is true."
+            type: list
+            returned: Always
+            elements: dict
+            contains:
+                alias:
+                    description:
+                        - "When I(true), the name is treated as an alias."
+                    type: bool
+                    returned: Always
+                name:
+                    description:
+                        - "A name for the host."
+                    type: str
+                    returned: Always
+                primary_name:
+                    description:
+                        - "When I(true), the name field is treated as primary name. There must be one and only one primary name in the list of host names. The primary name will be treated as the canonical name for all the aliases. PTR record will be generated only for the primary name."
+                    type: bool
+                    returned: Always
+                zone:
+                    description:
+                        - "The resource identifier."
+                    type: str
+                    returned: Always
         id:
             description:
                 - "The resource identifier."
             type: str
             returned: Always
-        parent:
+        name:
             description:
-                - "The resource identifier."
-            type: str
-            returned: Always
-        protocol_fqdn:
-            description:
-                - "Delegation FQDN in punycode."
+                - "The name of the IPAM host. Must contain 1 to 256 characters. Can include UTF-8."
             type: str
             returned: Always
         tags:
             description:
-                - "Tagging specifics."
+                - "The tags for the IPAM host in JSON format."
             type: dict
             returned: Always
-        view:
+        updated_at:
             description:
-                - "The resource identifier."
+                - "Time when the object has been updated. Equals to I(created_at) if not updated after creation."
             type: str
             returned: Always
 """  # noqa: E501
@@ -154,20 +175,20 @@ from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import Bl
 
 try:
     from bloxone_client import ApiException, NotFoundException
-    from dns_config import DelegationApi
+    from ipam import IpamHostApi
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class DelegationInfoModule(BloxoneAnsibleModule):
+class IpamHostInfoModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(DelegationInfoModule, self).__init__(*args, **kwargs)
+        super(IpamHostInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
         self._limit = 1000
 
     def find_by_id(self):
         try:
-            resp = DelegationApi(self.client).read(self.params["id"], inherit="full")
+            resp = IpamHostApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return None
@@ -193,7 +214,7 @@ class DelegationInfoModule(BloxoneAnsibleModule):
 
         while True:
             try:
-                resp = DelegationApi(self.client).list(
+                resp = IpamHostApi(self.client).list(
                     offset=offset, limit=self._limit, filter=filter_str, tfilter=tag_filter_str
                 )
                 all_results.extend(resp.results)
@@ -233,7 +254,7 @@ def main():
         tag_filter_query=dict(type="str", required=False),
     )
 
-    module = DelegationInfoModule(
+    module = IpamHostInfoModule(
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=[
