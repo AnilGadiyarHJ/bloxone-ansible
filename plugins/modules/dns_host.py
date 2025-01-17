@@ -422,7 +422,9 @@ class HostModule(BloxoneAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -434,19 +436,29 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         absolute_name=dict(type="str"),
-        associated_server=dict(type="dict", options=dict(
-        )),
-        inheritance_sources=dict(type="dict", options=dict(
-            kerberos_keys=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            ), no_log=True),
-        )),
-        kerberos_keys=dict(type="list", elements="dict", options=dict(
-            key=dict(type="str", no_log=True),
-        ), no_log=True),
+        associated_server=dict(type="dict", options=dict()),
+        inheritance_sources=dict(
+            type="dict",
+            options=dict(
+                kerberos_keys=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                    no_log=True,
+                ),
+            ),
+        ),
+        kerberos_keys=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                key=dict(type="str", no_log=True),
+            ),
+            no_log=True,
+        ),
         server=dict(type="str"),
         tags=dict(type="dict"),
-
     )
 
     module = HostModule(
