@@ -28,6 +28,7 @@ action_groups:
     - ipam_address_block_info
     - ipam_host
     - ipam_host_info
+    - ipam_next_available_address_block_info
 
   infra:
     - infra_join_token
