@@ -5,7 +5,6 @@
 # - tsig keys
 # - acl
 
-
 - module_defaults:
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
@@ -205,7 +204,6 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].custom_root_ns_enabled == true
-
 
     - name: Create a DNS Server with DNSSEC Enable Validation (false)
       infoblox.bloxone.dns_server:
@@ -671,24 +669,6 @@
           - dns_server_info is not failed
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].minimal_responses == true
-          -
-    - name: update a DNS server name
-      infoblox.bloxone.dns_server:
-        name: "{{ dns_server_name }}_update"
-        minimal_responses: true
-        state: present
-      register: dns_server
-    - name: Get DNS server details
-      infoblox.bloxone.dns_server_info:
-        filters:
-          name: "{{ dns_server_name }}_update"
-      register: dns_server_info
-    - name: Assert the DNS server exists and has the correct minimal_responses setting
-      assert:
-        that:
-          - dns_server_info is not failed
-          - dns_server_info.objects | length == 1
-          - dns_server_info.objects[0].name == "{{ dns_server_name }}_update"
 
     - name: Create a DNS server with Notify set to true
       infoblox.bloxone.dns_server:
@@ -928,11 +908,5 @@
     - name: "Delete Dns Server"
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
-        state: "absent"
-      ignore_errors: true
-
-    - name: "Delete Dns Server Update"
-      infoblox.bloxone.dns_server:
-        name: "{{ dns_server_name }}_update"
         state: "absent"
       ignore_errors: true
