@@ -41,6 +41,7 @@ options:
             - "* I(hmac_sha512)"
             - "Defaults to I(hmac_sha256)."
         type: str
+        default: hmac_sha256
     comment:
         description:
             - "The description for the TSIG key. May contain 0 to 1024 characters. Can include UTF-8."
@@ -49,6 +50,7 @@ options:
         description:
             - "The TSIG key name in the absolute domain name format."
         type: str
+        required: true
     secret:
         description:
             - "The TSIG key secret as a Base64 encoded string."
@@ -214,30 +216,6 @@ class TsigModule(BloxoneAnsibleModule):
             if len(resp.results) == 0:
                 return None
 
-    # def create(self):
-    #     if self.check_mode:
-    #         self.fail_json(msg=f"Params: {self.check_mode}")
-    #         return None
-    #
-    #     # # Debug the value of `secret`
-    #     # self.fail_json(msg=f"Secret Parameter: {self.params['secret']}")
-    #     #self.fail_json(msg=f"Params: {self.params}")
-    #     # Generate secret dynamically if not provided
-    #     # if self.params["secret"] is None:
-    #     #     self.fail_json(msg=f"entered")
-    #     api_res = GenerateTsigApi(self.client).generate_tsig(algorithm=self.params["algorithm"])
-    #
-    #     if api_res is None:
-    #         self.module.fail_json(msg=f"Failed to generate TSIG secret: {api_res.error}")
-    #     self.payload.secret = getattr(api_res.result, "secret")  # api_res.result.("secret")
-    #
-    #     # Include generated secret in the payload
-    #     # self.payload["secret"] = secret
-    #
-    #     resp = TsigApi(self.client).create(body=self.payload)
-    #     self.fail_json(msg=f"API Response: {resp}")
-    #     return resp.result.model_dump(by_alias=True, exclude_none=True)
-
     def create(self):
         if self.check_mode:
             return None
@@ -311,7 +289,7 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        algorithm=dict(type="str", default="hmac_sha512"),
+        algorithm=dict(type="str", default="hmac_sha256"),
         comment=dict(type="str"),
         name=dict(type="str", required=True),
         secret=dict(type="str", no_log=False, required=False),
