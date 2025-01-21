@@ -157,7 +157,7 @@ from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import Bl
 
 try:
     from bloxone_client import ApiException, NotFoundException
-    from keys import TsigApi, TSIGKey, GenerateTsigApi
+    from keys import GenerateTsigApi, TsigApi, TSIGKey
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
