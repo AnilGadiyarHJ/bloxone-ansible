@@ -68,6 +68,7 @@ options:
         description:
             - "The resource identifier."
         type: str
+        default: ""
     tags:
         description:
             - "Host tagging specifics."
