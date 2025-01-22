@@ -33,13 +33,12 @@ options:
     algorithm:
         description:
             - "The TSIG key algorithm."
-            - "Valid values are:"
-            - "* I(hmac_sha1)"
-            - "* I(hmac_sha224)"
-            - "* I(hmac_sha256)"
-            - "* I(hmac_sha384)"
-            - "* I(hmac_sha512)"
-            - "Defaults to I(hmac_sha256)."
+        choices:
+            - hmac_sha1
+            - hmac_sha224
+            - hmac_sha256
+            - hmac_sha384
+            - hmac_sha512
         type: str
         default: hmac_sha256
     comment:
@@ -76,7 +75,15 @@ EXAMPLES = r"""
   infoblox.bloxone.tsig_key:
     name: "test-tsig-key"
     secret: "fA+n89+aOCjFVNzBPbYkl+j3oQcl4U19JAkCIK9Ad8k="
-    algorithm: "hmac_sha51"
+    algorithm: "hmac_sha512"
+    state: present
+    tags:
+      location: "site-1"
+      
+- name: Create TSIG Key with secret dynamically generated
+  infoblox.bloxone.tsig_key:
+    name: "test-tsig-key2"
+    algorithm: "hmac_sha512"
     state: present
     tags:
       location: "site-1"
@@ -90,7 +97,7 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the Tsig object
+        - ID of the TSIG object
     type: str
     returned: Always
 item:
@@ -170,9 +177,6 @@ class TsigModule(BloxoneAnsibleModule):
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = TSIGKey.from_dict(self._payload_params)
         self._existing = None
-
-        # self.secret = None
-        # self.algorithm = None
 
     @property
     def existing(self):
@@ -289,7 +293,7 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        algorithm=dict(type="str", default="hmac_sha256"),
+        algorithm=dict(type="str", choices=["hmac_sha1", "hmac_sha224", "hmac_sha256", "hmac_sha384", "hmac_sha512"], default="hmac_sha256"),
         comment=dict(type="str"),
         name=dict(type="str", required=True),
         secret=dict(type="str", no_log=False, required=False),

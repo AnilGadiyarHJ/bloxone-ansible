@@ -144,7 +144,7 @@
           - tsig_key_info.objects[0].name == tsig_key_name
           - tsig_key_info.objects[0].algorithm == "hmac_sha384"
 
-    - name: Create a TSIG Key with secret generated
+    - name: Create a TSIG Key with the secret dynamically generated
       infoblox.bloxone.tsig_key:
         name: "{{ tsig_key_name }}_generated."
         algorithm: "hmac_sha384"
@@ -226,14 +226,12 @@
           - tsig_key_info.objects[0].tags.location == "site-1"
 
   always:
-    # Cleanup if the test fails
     - name: "Delete tsig keys"
       infoblox.bloxone.tsig_key:
         name: "{{ tsig_key_name }}"
         state: "absent"
       ignore_errors: true
 
-    # Cleanup if the test fails
     - name: "Delete tsig keys"
       infoblox.bloxone.tsig_key:
         name: "{{ tsig_key_name }}_generated."
