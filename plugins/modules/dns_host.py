@@ -457,7 +457,7 @@ def main():
             ),
             no_log=True,
         ),
-        server=dict(type="str"),
+        server=dict(type="str", default=""),
         tags=dict(type="dict"),
     )
 
