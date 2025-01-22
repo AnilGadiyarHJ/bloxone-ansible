@@ -293,7 +293,11 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        algorithm=dict(type="str", choices=["hmac_sha1", "hmac_sha224", "hmac_sha256", "hmac_sha384", "hmac_sha512"], default="hmac_sha256"),
+        algorithm=dict(
+            type="str",
+            choices=["hmac_sha1", "hmac_sha224", "hmac_sha256", "hmac_sha384", "hmac_sha512"],
+            default="hmac_sha256",
+        ),
         comment=dict(type="str"),
         name=dict(type="str", required=True),
         secret=dict(type="str", no_log=False, required=False),
