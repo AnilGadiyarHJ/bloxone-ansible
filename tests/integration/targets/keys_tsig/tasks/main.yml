@@ -225,17 +225,17 @@
           - tsig_key_info.objects | length == 1
           - tsig_key_info.objects[0].tags.location == "site-1"
 
-#  always:
-#    # Cleanup if the test fails
-#    - name: "Delete tsig keys"
-#      infoblox.bloxone.tsig_key:
-#        name: "{{ tsig_key_name }}"
-#        state: "absent"
-#      ignore_errors: true
-#
-#    # Cleanup if the test fails
-#    - name: "Delete tsig keys"
-#      infoblox.bloxone.tsig_key:
-#        name: "{{ tsig_key_name }}_generated."
-#        state: "absent"
-#      ignore_errors: true
+  always:
+    # Cleanup if the test fails
+    - name: "Delete tsig keys"
+      infoblox.bloxone.tsig_key:
+        name: "{{ tsig_key_name }}"
+        state: "absent"
+      ignore_errors: true
+
+    # Cleanup if the test fails
+    - name: "Delete tsig keys"
+      infoblox.bloxone.tsig_key:
+        name: "{{ tsig_key_name }}_generated."
+        state: "absent"
+      ignore_errors: true
