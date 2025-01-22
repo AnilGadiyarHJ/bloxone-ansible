@@ -4,6 +4,7 @@ action_groups:
         extend_group:
           - ipam
           - dns
+          - keys
           - infra
   dns:
     - dns_view
@@ -27,6 +28,11 @@ action_groups:
     - ipam_host
     - ipam_host_info
     - ipam_next_available_address_block_info
+
+  keys:
+    - tsig_key
+    - tsig_key_info
+    - kerberos_keys_info
 
   infra:
     - infra_join_token
