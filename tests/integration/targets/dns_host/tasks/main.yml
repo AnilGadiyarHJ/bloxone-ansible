@@ -152,7 +152,6 @@
           - dns_host_info.objects | length == 1
 
   always:
-    # Cleanup if the test fails
     - name: "Unassociated DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
@@ -160,7 +159,6 @@
         state: "present"
       ignore_errors: true
 
-    # Cleanup if the test fails
     - name: "Unassociated DNS Host 2"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info_2.objects[0].legacy_id }}"
@@ -168,7 +166,6 @@
         state: "present"
       ignore_errors: true
 
-    # Cleanup if the test fails
     - ansible.builtin.include_role:
         name: setup_dns_server
         tasks_from: cleanup.yml
