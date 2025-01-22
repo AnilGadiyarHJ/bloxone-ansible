@@ -35,12 +35,12 @@ action_groups:
     - ipam_address
     - ipam_address_info
     - ipam_next_available_ip_info
+    - ipam_host
+    - ipam_host_info
 
   infra:
     - infra_host
     - infra_host_info
-    - ipam_host
-    - ipam_host_info
     - infra_join_token
     - infra_join_token_info
 
