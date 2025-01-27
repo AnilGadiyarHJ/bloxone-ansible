@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_forward_nsg_info
-short_description: Manage Forward NSG
+short_description: Retrieve Forward NSG
 description:
     - Manage Forward NSG
 version_added: 2.0.0
@@ -69,12 +69,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the ForwardNsg object
+        - ID of the Forward NSG object
     type: str
     returned: Always
 objects:
     description:
-        - ForwardNsg object
+        - Forward NSG object
     type: list
     elements: dict
     returned: Always

@@ -4,7 +4,7 @@
       csp_url: "{{ csp_url }}"
       api_key: "{{ api_key }}"
   block:
-    # Create a random Auth Zone name to avoid conflicts
+    # Create a random Forward Zone name to avoid conflicts
     - ansible.builtin.set_fact:
         forward_nsg_name: "test-forward-nsg-{{ 999999 | random | string }}.com."
         tag_value: "site-{{ 999999 | random | string }}"
