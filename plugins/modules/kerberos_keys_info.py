@@ -56,6 +56,22 @@ extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Update Kerberos key with comment
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_id }}"
+        comment: "testing comment"
+        state: present
+
+    - name: update Kerberos key with tags
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_id }}"
+        comment: "testing check mode"
+        tags:
+          location: "tf_acc_test"
+        state: "present"
+"""
+
 RETURN = r"""
 id:
     description:

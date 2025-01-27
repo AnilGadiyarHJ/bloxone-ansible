@@ -32,6 +32,7 @@ action_groups:
   keys:
     - tsig_key
     - tsig_key_info
+    - kerberos_keys
     - kerberos_keys_info
 
   infra:

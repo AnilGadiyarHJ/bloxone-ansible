@@ -43,6 +43,18 @@ extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Get Kerberos key information by principal
+      infoblox.bloxone.kerberos_keys_info:
+        filters:
+          principal: "{{ principal }}"
+
+    - name: Get Kerberos key information by tag filter
+      infoblox.bloxone.kerberos_keys_info:
+        tag_filters:
+          location: "site-1"
+"""
+
 RETURN = r"""
 id:
     description:
@@ -141,7 +153,7 @@ class KerberosModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = KerberosApi(self.client).read(self.params["id"], inherit="full")
+                resp = KerberosApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -227,7 +239,6 @@ def main():
     module = KerberosModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["algorithm"])],
     )
 
     module.run_command()
