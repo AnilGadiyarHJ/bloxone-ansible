@@ -16,7 +16,7 @@
           display_name: "{{ host_display_name }}"
       register: infra_host_info
 
-    - name: update DNS Host Creation (Check Mode)
+    - name: Update DNS Host Creation (Check Mode)
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "{{ absolute_name }}"
@@ -36,7 +36,7 @@
           - dns_host.failed == false
           - dns_host_info.objects | length == 0
 
-    - name: update DNS Host Creation
+    - name: Update DNS Host Creation
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "{{ absolute_name }}"
@@ -55,7 +55,7 @@
           - dns_host_info is not failed
           - dns_host_info.objects | length == 1
 
-    - name: create DNS Host Creation (idempotent)
+    - name: Create DNS Host Creation (idempotent)
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "{{ absolute_name }}"
@@ -100,7 +100,7 @@
         fail_msg: "The DNS host deletion was expected to fail due to missing 'delete' method, but it succeeded."
         success_msg: "The DNS host deletion failed as expected."
 
-    - name: update absoule name for DNS Host
+    - name: Update absolute name for DNS Host
       infoblox.bloxone.dns_host:
        absolute_name: "test_dns_host_name_updated."
        id: "{{ infra_host_info.objects[0].legacy_id }}"
@@ -132,7 +132,7 @@
           display_name: "{{ host_display_name2 }}"
       register: infra_host_info_2
 
-    - name: update server name for DNS Host
+    - name: Update server name for DNS Host
       infoblox.bloxone.dns_host:
        absolute_name: "{{ absolute_name }}"
        id: "{{ infra_host_info_2.objects[0].legacy_id }}"
@@ -167,7 +167,7 @@
       ignore_errors: true
 
     - ansible.builtin.include_role:
-        name: setup_dns_server
+        name: "Setup_dns_server"
         tasks_from: cleanup.yml
 
     - name: "Delete Dns Server2"

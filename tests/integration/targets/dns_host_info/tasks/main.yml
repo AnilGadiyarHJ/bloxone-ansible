@@ -20,7 +20,7 @@
           - infra_host_info is not failed
           - infra_host_info.objects | length == 1
 
-    - name: create DNS Host Creation
+    - name: Create DNS Host Creation
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "{{ absolute_name }}"
