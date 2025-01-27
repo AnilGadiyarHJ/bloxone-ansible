@@ -204,7 +204,7 @@ class TsigModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = TsigApi(self.client).read(self.params["id"], inherit="full")
+                resp = TsigApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":

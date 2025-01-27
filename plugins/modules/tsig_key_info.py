@@ -69,12 +69,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the Tsig object
+        - ID of the TSIG object
     type: str
     returned: Always
 objects:
     description:
-        - Tsig object
+        - TSIG object
     type: list
     elements: dict
     returned: Always
