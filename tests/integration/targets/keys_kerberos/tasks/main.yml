@@ -1,0 +1,95 @@
+---
+- module_defaults:
+    group/infoblox.bloxone.all:
+      csp_url: "{{ csp_url }}"
+      api_key: "{{ api_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        principal: "DNS/ns.b1ddi.ms47.com"
+        tag_value: "tf_acc_test"
+
+    - name: Get Kerberos key information by principal
+      infoblox.bloxone.kerberos_keys_info:
+        filters:
+          principal: "{{ principal }}"
+      register: kerberos_info
+
+    - name: update Kerberos key (check mode)
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_info.objects[0].id }}"
+        comment: "testing check mode"
+        tags:
+          location: "tf_acc_test"
+        state: "present"
+      check_mode: true
+      register: kerberos
+    - name: Get Kerberos key information by tag filter
+      infoblox.bloxone.kerberos_keys_info:
+        tag_filters:
+          location: "tf_acc_test"
+      register: kerberos_info
+    - assert:
+        that:
+          - kerberos is changed
+          - kerberos is not failed
+          - kerberos_info.objects | length == 0
+
+    - name: Get Kerberos key information by principal
+      infoblox.bloxone.kerberos_keys_info:
+        filters:
+          principal: "{{ principal }}"
+      register: kerberos_info
+    - name: Update Kerberos key with tags
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_info.objects[0].id }}"
+        tags:
+          location: "tf_acc_test"
+        state: present
+      register: kerberos
+    - name: Get Kerberos key information by tag filter
+      infoblox.bloxone.kerberos_keys_info:
+        tag_filters:
+           location: "tf_acc_test"
+      register: kerberos_info
+    - assert:
+        that:
+          - kerberos_info is not failed
+          - kerberos_info.objects[0].tags.location == "tf_acc_test"
+
+    - name: Update Kerberos key (idempotent)
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_info.objects[0].id }}"
+        tags:
+          location: "tf_acc_test"
+        state: present
+      register: kerberos
+    - assert:
+        that:
+          - kerberos is not changed
+          - kerberos is not failed
+
+    - name: Update Kerberos key with comment
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_info.objects[0].id }}"
+        comment: "testing comment"
+        state: present
+      register: kerberos
+    - name: Get Kerberos key information by tag filter
+      infoblox.bloxone.kerberos_keys_info:
+        tag_filters:
+           location: "tf_acc_test"
+      register: kerberos_info
+    - assert:
+        that:
+          - kerberos_info is not failed
+          - kerberos_info.objects[0].comment == "testing comment"
+          - kerberos_info.objects[0].tags.location == "tf_acc_test"
+
+  always:
+    - name: "clean up comment and tags"
+      infoblox.bloxone.kerberos_keys:
+        id: "{{ kerberos_info.objects[0].id }}"
+        comment: ""
+        tags: {}
+        state: present
