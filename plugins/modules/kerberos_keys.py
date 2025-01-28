@@ -179,7 +179,6 @@ class KerberosModule(BloxoneAnsibleModule):
     def update(self):
         if self.check_mode:
             return None
-
         resp = KerberosApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 

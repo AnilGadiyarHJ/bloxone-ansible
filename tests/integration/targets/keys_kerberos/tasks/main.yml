@@ -15,12 +15,12 @@
           principal: "{{ principal }}"
       register: kerberos_info
 
-    - name: update Kerberos key (check mode)
+    - name: Update Kerberos key (check mode)
       infoblox.bloxone.kerberos_keys:
         id: "{{ kerberos_info.objects[0].id }}"
         comment: "testing check mode"
         tags:
-          location: "tf_acc_test"
+          location: "{{ tag_value }}"
         state: "present"
       check_mode: true
       register: kerberos
@@ -78,7 +78,7 @@
     - name: Get Kerberos key information by tag filter
       infoblox.bloxone.kerberos_keys_info:
         tag_filters:
-           location: "tf_acc_test"
+           location: "{{ tag_value }}"
       register: kerberos_info
     - assert:
         that:
@@ -87,9 +87,9 @@
           - kerberos_info.objects[0].tags.location == "tf_acc_test"
 
   always:
-    - name: "clean up comment and tags"
+    - name: "Clean up comment and tags"
       infoblox.bloxone.kerberos_keys:
         id: "{{ kerberos_info.objects[0].id }}"
         comment: ""
-        tags: {}
+        tags: { }
         state: present

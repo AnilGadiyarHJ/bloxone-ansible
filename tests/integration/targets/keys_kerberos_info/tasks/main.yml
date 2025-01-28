@@ -17,6 +17,7 @@
     - name: update kerboros with tag vaule
       infoblox.bloxone.kerberos_keys:
         id: "{{ kerberos_info.objects[0].id }}"
+        comment: "test"
         tags:
           location: "{{ tag_value }}"
         state: present
@@ -55,8 +56,9 @@
           - kerberos_info.objects[0].id is defined
 
   always:
-    - name: "clean up tag"
+    - name: "Clean up comment and tag"
       infoblox.bloxone.kerberos_keys:
         id: "{{ kerberos_info.objects[0].id }}"
-        tags: {}
+        comment: ""
+        tags: { }
         state: present
