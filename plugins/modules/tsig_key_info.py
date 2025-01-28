@@ -150,7 +150,7 @@ class TsigInfoModule(BloxoneAnsibleModule):
 
     def find_by_id(self):
         try:
-            resp = TsigApi(self.client).read(self.params["id"], inherit="full")
+            resp = TsigApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return None
