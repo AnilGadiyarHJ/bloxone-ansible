@@ -113,7 +113,7 @@ from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import Bl
 
 try:
     from bloxone_client import ApiException, NotFoundException
-    from keys import KerberosKey, KerberosApi
+    from keys import KerberosApi, KerberosKey
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
@@ -219,7 +219,9 @@ class KerberosModule(BloxoneAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -232,7 +234,6 @@ def main():
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
         tags=dict(type="dict"),
-
     )
 
     module = KerberosModule(
