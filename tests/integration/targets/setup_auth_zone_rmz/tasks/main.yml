@@ -3,10 +3,12 @@
     group/infoblox.bloxone.all:
       csp_url: "{{ csp_url }}"
       api_key: "{{ api_key }}"
+
   block:
-    - name: "Delete an Auth Zone"
+    - name: Create Reverse Mapping Zone
       infoblox.bloxone.dns_auth_zone:
-        fqdn: "{{ _fqdn_auth_zone }}"
+        fqdn: "0.0.40.in-addr.arpa."
+        primary_type: cloud
         view: "{{ _view.id }}"
-        state: "absent"
-      ignore_errors: true
+        state: present
+      register: rmz
