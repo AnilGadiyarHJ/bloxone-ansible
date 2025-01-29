@@ -10,7 +10,7 @@
       csp_url: "{{ csp_url }}"
       api_key: "{{ api_key }}"
   block:
-    # Create a random Auth Zone name to avoid conflicts
+    # Create a random name to avoid conflicts
     - ansible.builtin.set_fact:
         dns_server_name: "test-dns-server-{{ 999999 | random | string }}"
 
