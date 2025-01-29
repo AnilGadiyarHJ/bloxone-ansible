@@ -142,9 +142,9 @@ except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class TsigInfoModule(BloxoneAnsibleModule):
+class TsigKeyInfoModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(TsigInfoModule, self).__init__(*args, **kwargs)
+        super(TsigKeyInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
         self._limit = 1000
 
@@ -216,7 +216,7 @@ def main():
         tag_filter_query=dict(type="str", required=False),
     )
 
-    module = TsigInfoModule(
+    module = TsigKeyInfoModule(
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=[

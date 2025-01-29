@@ -169,9 +169,9 @@ except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class TsigModule(BloxoneAnsibleModule):
+class TsigKeyModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(TsigModule, self).__init__(*args, **kwargs)
+        super(TsigKeyModule, self).__init__(*args, **kwargs)
 
         exclude = ["state", "csp_url", "api_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
@@ -300,11 +300,11 @@ def main():
         ),
         comment=dict(type="str"),
         name=dict(type="str", required=True),
-        secret=dict(type="str", no_log=False, required=False),
+        secret=dict(type="str", no_log=True, required=False),
         tags=dict(type="dict"),
     )
 
-    module = TsigModule(
+    module = TsigKeyModule(
         argument_spec=module_args,
         supports_check_mode=True,
         required_if=[("state", "present", ["name"])],
