@@ -9,10 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: dns_forward_zone
-short_description: Manage ForwardZone
+module: dns_forward_nsg
+short_description: Manage Forward NSG
 description:
-    - Manage ForwardZone
+    - Manage Forward NSG
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -32,12 +32,8 @@ options:
         default: present
     comment:
         description:
-            - "Optional. Comment for zone configuration."
+            - "Optional. Comment for the object."
         type: str
-    disabled:
-        description:
-            - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
-        type: bool
     external_forwarders:
         description:
             - "Optional. External DNS servers to forward to. Order is not significant."
@@ -52,15 +48,10 @@ options:
                 description:
                     - "Server FQDN."
                 type: str
-    forward_only:
+    forwarders_only:
         description:
             - "Optional. I(true) to only forward."
         type: bool
-    fqdn:
-        description:
-            - "Zone FQDN. The FQDN supplied at creation will be converted to canonical form."
-            - "Read-only after creation."
-        type: str
     hosts:
         description:
             - "The resource identifier."
@@ -71,79 +62,63 @@ options:
             - "The resource identifier."
         type: list
         elements: str
+    name:
+        description:
+            - "Name of the object."
+        type: str
     nsgs:
         description:
             - "The resource identifier."
         type: list
         elements: str
-    parent:
-        description:
-            - "The resource identifier."
-        type: str
     tags:
         description:
             - "Tagging specifics."
         type: dict
-    view:
-        description:
-            - "The resource identifier."
-        type: str
-        required: true
 
 extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
 EXAMPLES = r"""
-  - name: Create a Forward Zone
-    infoblox.bloxone.dns_forward_zone:
-      fqdn: "example_zone."
-      state: present
-
-  - name: Create an Forward Zone with Additional Fields
-    infoblox.bloxone.dns_forward_zone:
-      fqdn: "example_zone."
-      comment: "Example Forward Zone"
-      disabled: true
+  - name: Create a Forward NSG
+    infoblox.bloxone.dns_forward_nsg:
+      name: "example_nsg"
+      state: "present"
+      
+  - name: Create a Forward NSG with Additional Fields
+    infoblox.bloxone.dns_forward_nsg:
+      name: "example_nsg"
+      comment: "Example Forward NSG"
       external_forwarders:
-       - address: "192.168.10.10"
-      notify: true
+        - address: "1.1.1.1"
+          fqdn: "a.com."
       state: "present"
       tags:
         location: "site-1"
-
-  - name: Delete the Zone
-    infoblox.bloxone.dns_forward_zone:
-      name: "example_zone."
+        
+  - name: Delete the Forward NSG
+    infoblox.bloxone.dns_forward_nsg:
+      name: "example_nsg"
       state: "absent"
 """  # noqa: E501
 
 RETURN = r"""
 id:
     description:
-        - ID of the ForwardZone object
+        - ID of the ForwardNsg object
     type: str
     returned: Always
 item:
     description:
-        - ForwardZone object
+        - ForwardNsg object
     type: complex
     returned: Always
     contains:
         comment:
             description:
-                - "Optional. Comment for zone configuration."
+                - "Optional. Comment for the object."
             type: str
-            returned: Always
-        created_at:
-            description:
-                - "The timestamp when the object has been created."
-            type: str
-            returned: Always
-        disabled:
-            description:
-                - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
-            type: bool
             returned: Always
         external_forwarders:
             description:
@@ -167,16 +142,10 @@ item:
                         - "Server FQDN in punycode."
                     type: str
                     returned: Always
-        forward_only:
+        forwarders_only:
             description:
                 - "Optional. I(true) to only forward."
             type: bool
-            returned: Always
-        fqdn:
-            description:
-                - "Zone FQDN. The FQDN supplied at creation will be converted to canonical form."
-                - "Read-only after creation."
-            type: str
             returned: Always
         hosts:
             description:
@@ -193,18 +162,9 @@ item:
                 - "The resource identifier."
             type: list
             returned: Always
-        mapped_subnet:
+        name:
             description:
-                - "Reverse zone network address in the following format: \"ip-address/cidr\". Defaults to empty."
-            type: str
-            returned: Always
-        mapping:
-            description:
-                - "Read-only. Zone mapping type. Allowed values:"
-                - "* I(forward),"
-                - "* I(ipv4_reverse)."
-                - "* I(ipv6_reverse)."
-                - "Defaults to I(forward)."
+                - "Name of the object."
             type: str
             returned: Always
         nsgs:
@@ -212,66 +172,29 @@ item:
                 - "The resource identifier."
             type: list
             returned: Always
-        parent:
-            description:
-                - "The resource identifier."
-            type: str
-            returned: Always
-        protocol_fqdn:
-            description:
-                - "Zone FQDN in punycode."
-            type: str
-            returned: Always
         tags:
             description:
                 - "Tagging specifics."
             type: dict
             returned: Always
-        updated_at:
-            description:
-                - "The timestamp when the object has been updated. Equals to I(created_at) if not updated after creation."
-            type: str
-            returned: Always
-        view:
-            description:
-                - "The resource identifier."
-            type: str
-            returned: Always
-        warnings:
-            description:
-                - "The list of a forward zone warnings."
-            type: list
-            returned: Always
-            elements: dict
-            contains:
-                message:
-                    description:
-                        - "Warning message."
-                    type: str
-                    returned: Always
-                name:
-                    description:
-                        - "Name of a warning."
-                    type: str
-                    returned: Always
 """  # noqa: E501
 
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
     from bloxone_client import ApiException, NotFoundException
-    from dns_config import ForwardZone, ForwardZoneApi
+    from dns_config import ForwardNSG, ForwardNsgApi
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class ForwardZoneModule(BloxoneAnsibleModule):
+class ForwardNsgModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(ForwardZoneModule, self).__init__(*args, **kwargs)
+        super(ForwardNsgModule, self).__init__(*args, **kwargs)
 
         exclude = ["state", "csp_url", "api_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
-        self._payload = ForwardZone.from_dict(self._payload_params)
+        self._payload = ForwardNSG.from_dict(self._payload_params)
         self._existing = None
 
     @property
@@ -300,19 +223,19 @@ class ForwardZoneModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = ForwardZoneApi(self.client).read(self.params["id"])
+                resp = ForwardNsgApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
                     return None
                 raise e
         else:
-            filter = f"fqdn=='{self.params['fqdn']}' and view=='{self.params['view']}'"
-            resp = ForwardZoneApi(self.client).list(filter=filter)
+            filter = f"name=='{self.params['name']}'"
+            resp = ForwardNsgApi(self.client).list(filter=filter)
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple ForwardZone: {resp.results}")
+                self.fail_json(msg=f"Found multiple ForwardNsg: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -320,24 +243,21 @@ class ForwardZoneModule(BloxoneAnsibleModule):
         if self.check_mode:
             return None
 
-        resp = ForwardZoneApi(self.client).create(body=self.payload)
+        resp = ForwardNsgApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
 
-        update_body = self.payload
-        update_body = self.validate_readonly_on_update(self.existing, update_body, ["fqdn", "view"])
-
-        resp = ForwardZoneApi(self.client).update(id=self.existing.id, body=update_body)
+        resp = ForwardNsgApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
         if self.check_mode:
             return
 
-        ForwardZoneApi(self.client).delete(self.existing.id)
+        ForwardNsgApi(self.client).delete(self.existing.id)
 
     def run_command(self):
         result = dict(changed=False, object={}, id=None)
@@ -350,16 +270,16 @@ class ForwardZoneModule(BloxoneAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "ForwardZone created"
+                result["msg"] = "ForwardNsg created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "ForwardZone updated"
+                    result["msg"] = "ForwardNsg updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "ForwardZone deleted"
+                result["msg"] = "ForwardNsg deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -384,7 +304,6 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
         external_forwarders=dict(
             type="list",
             elements="dict",
@@ -393,20 +312,18 @@ def main():
                 fqdn=dict(type="str"),
             ),
         ),
-        forward_only=dict(type="bool"),
-        fqdn=dict(type="str"),
+        forwarders_only=dict(type="bool"),
         hosts=dict(type="list", elements="str"),
         internal_forwarders=dict(type="list", elements="str"),
+        name=dict(type="str"),
         nsgs=dict(type="list", elements="str"),
-        parent=dict(type="str"),
         tags=dict(type="dict"),
-        view=dict(type="str", required=True),
     )
 
-    module = ForwardZoneModule(
+    module = ForwardNsgModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["fqdn", "view"])],
+        required_if=[("state", "present", ["name"])],
     )
 
     module.run_command()

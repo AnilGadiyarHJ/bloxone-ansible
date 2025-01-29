@@ -6,7 +6,7 @@
   block:
     # Create a random View name to avoid conflicts
     - ansible.builtin.set_fact:
-        dns_view_name: "test-view-{{ 999999 | random | string }}"
+        dns_view_name: "my-test-view-{{ 999999 | random | string }}"
 
     - name: Create a View
       infoblox.bloxone.dns_view:
