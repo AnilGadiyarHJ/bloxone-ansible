@@ -324,7 +324,7 @@ item:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
-    from bloxone_client import ApiException, NotFoundException
+    from universal_ddi_client import ApiException, NotFoundException
     from dns_config import Host, HostApi
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
@@ -334,7 +334,7 @@ class HostModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
         super(HostModule, self).__init__(*args, **kwargs)
 
-        exclude = ["state", "csp_url", "api_key", "id"]
+        exclude = ["state", "csp_url", "portal_url", "portal_key", "api_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = Host.from_dict(self._payload_params)
         self._existing = None
@@ -365,7 +365,7 @@ class HostModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = HostApi(self.client).read(self.params["id"], inherit="full")
+                resp = HostApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
