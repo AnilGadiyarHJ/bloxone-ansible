@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: infra_host
-short_description: Manage Hosts
+short_description: Manage Infrastructure Hosts
 description:
-    - Manage Hosts
+    - Manage Infrastructure Hosts
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -47,7 +47,14 @@ options:
             - "The resource identifier."
         type: str
     maintenance_mode:
+<<<<<<< HEAD
         description: ""
+=======
+        description: "The flag to indicate if the Host is in maintenance mode."
+        choices:
+            - enabled
+            - disabled
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
         type: str
     pool_id:
         description:
@@ -229,7 +236,11 @@ item:
             type: str
             returned: Always
         maintenance_mode:
+<<<<<<< HEAD
             description: ""
+=======
+            description: "The flag to indicate if the Host is in maintenance mode."
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
             type: str
             returned: Always
         nat_ip:
@@ -277,17 +288,30 @@ item:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
+<<<<<<< HEAD
     from bloxone_client import ApiException, NotFoundException
     from infra_mgmt import Host, HostsApi
+=======
+    from infra_mgmt import Host, HostsApi
+    from universal_ddi_client import ApiException, NotFoundException
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
+<<<<<<< HEAD
 class HostsModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
         super(HostsModule, self).__init__(*args, **kwargs)
 
         exclude = ["state", "csp_url", "api_key", "id"]
+=======
+class InfraHostModule(BloxoneAnsibleModule):
+    def __init__(self, *args, **kwargs):
+        super(InfraHostModule, self).__init__(*args, **kwargs)
+
+        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id"]
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = Host.from_dict(self._payload_params)
         self._existing = None
@@ -318,7 +342,11 @@ class HostsModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
+<<<<<<< HEAD
                 resp = HostsApi(self.client).read(self.params["id"], inherit="full")
+=======
+                resp = HostsApi(self.client).read(self.params["id"])
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -410,13 +438,21 @@ def main():
         display_name=dict(type="str"),
         ip_space=dict(type="str"),
         location_id=dict(type="str"),
+<<<<<<< HEAD
         maintenance_mode=dict(type="str"),
+=======
+        maintenance_mode=dict(type="str", choices=["enabled", "disabled"]),
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
         pool_id=dict(type="str"),
         serial_number=dict(type="str"),
         tags=dict(type="dict"),
     )
 
+<<<<<<< HEAD
     module = HostsModule(
+=======
+    module = InfraHostModule(
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
         argument_spec=module_args,
         supports_check_mode=True,
         required_if=[("state", "present", ["display_name"])],

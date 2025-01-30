@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: infra_host_info
-short_description: Manage Hosts
+short_description: Retrieve Infrastructure Hosts
 description:
-    - Manage Hosts
+    - Retrieve Infrastructure Hosts
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -31,16 +31,6 @@ options:
             - Filter query to filter objects
         type: str
         required: false
-    inherit:
-        description:
-            - Return inheritance information
-        type: str
-        required: false
-        choices:
-            - full
-            - partial
-            - none
-        default: full
     tag_filters:
         description:
             - Filter dict to filter objects by tags
@@ -74,6 +64,15 @@ EXAMPLES = r"""
     infoblox.bloxone.infra_host_info:
       tag_filters:
         location: "site-1"
+
+  - name: Get Host Information with retries
+    infoblox.bloxone.infra_host_info:
+      filters:
+        display_name: "example_host"
+    timeout: 10
+    retries: 5
+    delay: 1
+    until: "infra_host_info.objects | length == 1"
 """
 
 RETURN = r"""
@@ -267,8 +266,8 @@ objects:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
-    from bloxone_client import ApiException, NotFoundException
     from infra_mgmt import HostsApi
+    from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
@@ -281,7 +280,7 @@ class HostsInfoModule(BloxoneAnsibleModule):
 
     def find_by_id(self):
         try:
-            resp = HostsApi(self.client).read(self.params["id"], inherit="full")
+            resp = HostsApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return None
@@ -348,7 +347,6 @@ def main():
         id=dict(type="str", required=False),
         filters=dict(type="dict", required=False),
         filter_query=dict(type="str", required=False),
-        inherit=dict(type="str", required=False, choices=["full", "partial", "none"], default="full"),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )

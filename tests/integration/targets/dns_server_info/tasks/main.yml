@@ -8,8 +8,8 @@
 
 - module_defaults:
     group/infoblox.bloxone.all:
-      csp_url: "{{ csp_url }}"
-      api_key: "{{ api_key }}"
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
   block:
     # Create a random Auth Zone name to avoid conflicts
     - ansible.builtin.set_fact:
@@ -28,7 +28,7 @@
         state: present
       register: dns_server
 
-    - name: Get Information about the DNS Server
+    - name: Get Information about the DNS Server by filter (name)
       infoblox.bloxone.dns_server_info:
         filters:
           name: "{{ dns_server_name }}"
@@ -57,10 +57,17 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].id == dns_server.id
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
   always:
     - name: "Delete dns server"
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         state: "absent"
+<<<<<<< HEAD
       ignore_errors: true
+=======
+      ignore_errors: true
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121

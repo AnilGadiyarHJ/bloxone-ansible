@@ -10,9 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_server_info
-short_description: Manage Server
+short_description: Retrieve a Server ( DNS Config Profile )
 description:
-    - Manage Server
+    - Retrieves information about DNS Config Profiles.
+    - A Server (DNS Config Profile) is a named configuration profile that can be shared for specified list of hosts.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -61,7 +62,11 @@ EXAMPLES = r"""
     infoblox.bloxone.dns_server_info:
       id: "{{ dns_server_id }}"
 
+<<<<<<< HEAD
   - name: Get DNS Server information by filters (e.g., name)
+=======
+  - name: Get DNS Server information by filters (e.g. name)
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
     infoblox.bloxone.dns_server_info:
       filters:
         name: "example_server"
@@ -162,7 +167,26 @@ objects:
             elements: dict
             contains:
                 algorithm:
+<<<<<<< HEAD
                     description: ""
+=======
+                    description: 
+                        - "Specifies the cryptographic algorithm used for DNSSEC. Supported values and their corresponding mappings are as follows."
+                        - "RSAMD5 (1)"
+                        - "DH (2)"
+                        - "DSA (3)"
+                        - "RSASHA1 (5)"
+                        - "DSANSEC3SHA1 (6)"
+                        - "RSASHA1NSEC3SHA1 (7)"
+                        - "RSASHA256 (8)"
+                        - "RSASHA512 (10)"
+                        - "ECDSAP256SHA256 (13)"
+                        - "ECDSAP384SHA384 (14)"
+                        - "**Deprecated Algorithms:**"
+                        - "RSAMD5 (1)"
+                        - "DSA (3)"
+                        - "DSANSEC3SHA1 (6)"
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                     type: int
                     returned: Always
                 protocol_zone:
@@ -196,7 +220,26 @@ objects:
             elements: dict
             contains:
                 algorithm:
+<<<<<<< HEAD
                     description: ""
+=======
+                    description: 
+                        - "Specifies the cryptographic algorithm used for DNSSEC. Supported values and their corresponding mappings are as follows."
+                        - "RSAMD5 (1)"
+                        - "DH (2)"
+                        - "DSA (3)"
+                        - "RSASHA1 (5)"
+                        - "DSANSEC3SHA1 (6)"
+                        - "RSASHA1NSEC3SHA1 (7)"
+                        - "RSASHA256 (8)"
+                        - "RSASHA512 (10)"
+                        - "ECDSAP256SHA256 (13)"
+                        - "ECDSAP384SHA384 (14)"
+                        - "**Deprecated Algorithms:**"
+                        - "RSAMD5 (1)"
+                        - "DSA (3)"
+                        - "DSANSEC3SHA1 (6)"
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                     type: int
                     returned: Always
                 protocol_zone:
@@ -545,7 +588,26 @@ objects:
                                     elements: dict
                                     contains:
                                         algorithm:
+<<<<<<< HEAD
                                             description: ""
+=======
+                                            description: 
+                                                - "Specifies the cryptographic algorithm used for DNSSEC. Supported values and their corresponding mappings are as follows."
+                                                - "RSAMD5 (1)"
+                                                - "DH (2)"
+                                                - "DSA (3)"
+                                                - "RSASHA1 (5)"
+                                                - "DSANSEC3SHA1 (6)"
+                                                - "RSASHA1NSEC3SHA1 (7)"
+                                                - "RSASHA256 (8)"
+                                                - "RSASHA512 (10)"
+                                                - "ECDSAP256SHA256 (13)"
+                                                - "ECDSAP384SHA384 (14)"
+                                                - "**Deprecated Algorithms:**"
+                                                - "RSAMD5 (1)"
+                                                - "DSA (3)"
+                                                - "DSANSEC3SHA1 (6)"
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                                             type: int
                                             returned: Always
                                         protocol_zone:
@@ -2355,8 +2417,13 @@ objects:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
+<<<<<<< HEAD
     from bloxone_client import ApiException, NotFoundException
     from dns_config import ServerApi
+=======
+    from dns_config import ServerApi
+    from universal_ddi_client import ApiException, NotFoundException
+>>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
