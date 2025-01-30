@@ -5,7 +5,7 @@
       api_key: "{{ api_key }}"
   block:
     - ansible.builtin.set_fact:
-        dns_server_name: "-dns-server-{{ 999999 | random | string }}"
+        dns_server_name: "dns-server-{{ 999999 | random | string }}"
 
     - name: Create a DNS Server
       infoblox.bloxone.dns_server:

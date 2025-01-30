@@ -4,11 +4,10 @@
       csp_url: "{{ csp_url }}"
       api_key: "{{ api_key }}"
   block:
-    # Create a random Forward Zone FQDN to avoid conflicts
     - ansible.builtin.set_fact:
         absolute_name: "test_dns_host_name-{{ 999999 | random | string }}."
-        host_display_name: "test_infra_host_anil"
-        host_display_name2: "ZTP_jt_yg_1402855201519044181"
+        host_display_name: "TF_TEST_HOST_01"
+        host_display_name2: "TF_TEST_HOST_02"
 
     - name: Retrieve Infra Host Information
       infoblox.bloxone.infra_host_info:
@@ -19,7 +18,6 @@
     - name: Update DNS Host Creation (Check Mode)
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
-        absolute_name: "{{ absolute_name }}"
         server: "{{ _dns_server.id }}"
         state: present
       check_mode: true
@@ -27,14 +25,14 @@
     - name: Get DNS Host Information
       infoblox.bloxone.dns_host_info:
         filters:
-          absolute_name: "{{ absolute_name }}"
+          name: "{{ infra_host_info.objects[0].display_name }}"
       register: dns_host_info
     - name: Assert DNS Host Creation
       assert:
         that:
           - dns_host is changed
           - dns_host.failed == false
-          - dns_host_info.objects | length == 0
+          - dns_host_info.objects | length == 1
 
     - name: Update DNS Host Creation
       infoblox.bloxone.dns_host:
@@ -46,14 +44,14 @@
     - name: Get DNS Host Information
       infoblox.bloxone.dns_host_info:
         filters:
-          absolute_name: "{{ absolute_name }}"
+          name: "{{ infra_host_info.objects[0].display_name }}"
       register: dns_host_info
     - name: Assert DNS Host Creation
       assert:
         that:
           - dns_host is changed
           - dns_host_info is not failed
-          - dns_host_info.objects | length == 1
+          - dns_host_info.objects | length == 1 # Dns host returns a object cause the object already exists
 
     - name: Create DNS Host Creation (idempotent)
       infoblox.bloxone.dns_host:
@@ -67,19 +65,18 @@
           - dns_host is not changed
           - dns_host is not failed
 
-    - name: Delete the DNS Host (Check Mode)
+    - name: Unassociated DNS host from the server (Check Mode)
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: absent
       check_mode: true
       register: dns_host
-      failed_when: false
     - name: Get DNS Host Information
       infoblox.bloxone.dns_host_info:
         filters:
-          absolute_name: "{{ absolute_name }}"
+          name: "{{ infra_host_info.objects[0].display_name }}"
       register: dns_host_info
-    - name: Assert that Deletion Failed
+    - name: Assert that server unassociated
       assert:
         that:
           - dns_host is changed
@@ -90,15 +87,16 @@
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: absent
       register: dns_host
-      failed_when: false
-    - name: Assert that Deletion Failed
+    - name: Get DNS Host Information
+      infoblox.bloxone.dns_host_info:
+        filters:
+          name: "{{ infra_host_info.objects[0].display_name }}"
+      register: dns_host_info
+    - name: Assert that server unassociated
       assert:
         that:
-          - "'msg' in dns_host"
-          - "'MODULE FAILURE' in dns_host.msg"
-          - "'delete' not in dns_host.msg"
-        fail_msg: "The DNS host deletion was expected to fail due to missing 'delete' method, but it succeeded."
-        success_msg: "The DNS host deletion failed as expected."
+          - dns_host is changed
+          - dns_host_info is not failed
 
     - name: Update absolute name for DNS Host
       infoblox.bloxone.dns_host:
@@ -132,7 +130,7 @@
           display_name: "{{ host_display_name2 }}"
       register: infra_host_info_2
 
-    - name: Update server name for DNS Host
+    - name: Update server for DNS Host
       infoblox.bloxone.dns_host:
        absolute_name: "{{ absolute_name }}"
        id: "{{ infra_host_info_2.objects[0].legacy_id }}"
@@ -142,7 +140,7 @@
     - name: Get DNS Host Information
       infoblox.bloxone.dns_host_info:
         filters:
-          absolute_name: "test_dns_host_name_updated."
+          name: "{{ infra_host_info_2.objects[0].display_name }}"
       register: dns_host_info
     - name: Assert DNS Host Exists
       assert:
@@ -155,19 +153,17 @@
     - name: "Unassociated DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
-        server: ""
-        state: "present"
+        state: "absent"
       ignore_errors: true
 
     - name: "Unassociated DNS Host 2"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info_2.objects[0].legacy_id }}"
-        server: ""
-        state: "present"
+        state: "absent"
       ignore_errors: true
 
     - ansible.builtin.include_role:
-        name: "Setup_dns_server"
+        name: "setup_dns_server"
         tasks_from: cleanup.yml
 
     - name: "Delete Dns Server2"

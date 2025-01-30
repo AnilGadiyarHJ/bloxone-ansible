@@ -6,7 +6,7 @@
   block:
     # Create a random Forward Zone FQDN to avoid conflicts
     - ansible.builtin.set_fact:
-        host_display_name: "test_infra_host_anil"
+        host_display_name: "TF_TEST_HOST_01"
         absolute_name: "test_dns_host_name-{{ 999999 | random | string }}."
 
     - name: Retrieve Infra Host Information
@@ -52,6 +52,9 @@
     - name: "Unassociated DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
-        server: ""
-        state: "present"
+        state: "absent"
       ignore_errors: true
+
+    - ansible.builtin.include_role:
+        name: "setup_dns_server"
+        tasks_from: cleanup.yml

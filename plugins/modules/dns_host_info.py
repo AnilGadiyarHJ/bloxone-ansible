@@ -57,6 +57,13 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+    - name: Create DNS Host Creation
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host.id }}"
+        absolute_name: "example_server_name"
+        server: "{{ server.id }}"
+        state: present
+      
     - name: Get DNS Host information by ID
       infoblox.bloxone.dns_host_info:
         id: "{{ dns_host_id }}"

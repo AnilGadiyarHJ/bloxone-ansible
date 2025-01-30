@@ -79,11 +79,21 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: update DNS Host Creation
+    - name: Retrieve Infra Host Information (required as parent)
+      infoblox.bloxone.infra_host_info:
+        filters:
+          display_name: "test_infra_host"
+      
+    - name: Create a DNS Server (required as parent)
+      infoblox.bloxone.dns_server:
+        name: "example_server"
+        state: present
+      
+    - name: Update DNS Host Creation 
       infoblox.bloxone.dns_host:
-        id: "dns/host/607548"
+        id: "{{ infra_host.id }}"
         absolute_name: "example_server_name"
-        server: "dns/server/dffe17f4-cc62-49f1-832c-31f4fb29c9ba"
+        server: "{{ server.id }}"
         state: present
 
     - name: Delete the DNS Server
@@ -390,7 +400,11 @@ class HostModule(BloxoneAnsibleModule):
         if self.check_mode:
             return
 
-        HostApi(self.client).delete(self.existing.id)
+        update_body = self.payload
+        setattr(update_body, "server", "")
+
+        resp = HostApi(self.client).update(id=self.existing.id, body=update_body)
+        return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def run_command(self):
         result = dict(changed=False, object={}, id=None)
@@ -412,7 +426,7 @@ class HostModule(BloxoneAnsibleModule):
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "Host deleted"
+                result["msg"] = "Host unassociated from the server"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -458,7 +472,7 @@ def main():
             ),
             no_log=True,
         ),
-        server=dict(type="str", default=""),
+        server=dict(type="str"),
         tags=dict(type="dict"),
     )
 
