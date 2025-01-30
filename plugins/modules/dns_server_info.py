@@ -2417,13 +2417,9 @@ objects:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
-<<<<<<< HEAD
-    from bloxone_client import ApiException, NotFoundException
-    from dns_config import ServerApi
-=======
     from dns_config import ServerApi
     from universal_ddi_client import ApiException, NotFoundException
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
+
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
