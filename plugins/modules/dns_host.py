@@ -68,7 +68,6 @@ options:
         description:
             - "The resource identifier."
         type: str
-        default: ""
     tags:
         description:
             - "Host tagging specifics."
@@ -83,13 +82,13 @@ EXAMPLES = r"""
       infoblox.bloxone.infra_host_info:
         filters:
           display_name: "test_infra_host"
-      
+
     - name: Create a DNS Server (required as parent)
       infoblox.bloxone.dns_server:
         name: "example_server"
         state: present
-      
-    - name: Update DNS Host Creation 
+
+    - name: Update DNS Host Creation
       infoblox.bloxone.dns_host:
         id: "{{ infra_host.id }}"
         absolute_name: "example_server_name"
@@ -401,6 +400,7 @@ class HostModule(BloxoneAnsibleModule):
             return
 
         update_body = self.payload
+        # set the server to empty string to unassociate the host
         setattr(update_body, "server", "")
 
         resp = HostApi(self.client).update(id=self.existing.id, body=update_body)

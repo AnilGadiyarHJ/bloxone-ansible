@@ -63,7 +63,7 @@ EXAMPLES = r"""
         absolute_name: "example_server_name"
         server: "{{ server.id }}"
         state: present
-      
+
     - name: Get DNS Host information by ID
       infoblox.bloxone.dns_host_info:
         id: "{{ dns_host_id }}"
