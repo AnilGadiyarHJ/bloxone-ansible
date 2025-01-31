@@ -130,7 +130,7 @@ objects:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
-    from bloxone_client import ApiException, NotFoundException
+    from universal_ddi_client import ApiException, NotFoundException
     from keys import KerberosApi
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
