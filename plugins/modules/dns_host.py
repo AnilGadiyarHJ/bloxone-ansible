@@ -10,9 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_host
-short_description: Manage DNS Host in description 
+short_description: Manages DNS Hosts
 description:
-    - Manage Host
+    - Manages DNS Hosts.
+    - A DNS Host object associates a DNS Config Profile with an on-prem host.
+    - Note: This resource represents an existing backend object that cannot be created or deleted through API calls. Instead, it can only be updated.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -88,7 +90,7 @@ EXAMPLES = r"""
         name: "example_server"
         state: present
 
-    - name: Update DNS Host Creation
+    - name: Update DNS Host
       infoblox.bloxone.dns_host:
         id: "{{ infra_host.id }}"
         absolute_name: "example_server_name"
@@ -365,21 +367,20 @@ class HostModule(BloxoneAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
+                # Attempt to read the host using the provided ID
                 resp = HostApi(self.client).read(self.params["id"])
+                if resp.result is None:
+                    # If no result is found, return None (this could happen if the ID is invalid or doesn't exist)
+                    return None
                 return resp.result
-            except NotFoundException as e:
+            except NotFoundException:
+                # If the ID is not found and the state is "absent", return None
                 if self.params["state"] == "absent":
                     return None
-                raise e
-        else:
-            filter = f"id=='{self.params['id']}' and server=='{self.params['server']}'"
-            resp = HostApi(self.client).list(filter=filter)
-            if len(resp.results) == 1:
-                return resp.results[0]
-            if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple Host: {resp.results}")
-            if len(resp.results) == 0:
-                return None
+                # If the state is not "absent", raise the exception to notify that the resource was not found
+                raise
+        # If no ID is provided, return None
+        return None
 
     def update(self):
         if self.check_mode:
@@ -407,19 +408,23 @@ class HostModule(BloxoneAnsibleModule):
         try:
             self.existing = self.find()
             item = {}
-            if self.params["state"] == "present" and self.existing is None:
-                item = self.create()
-                result["changed"] = True
-                result["msg"] = "Host created"
-            elif self.params["state"] == "present" and self.existing is not None:
-                if self.payload_changed():
+
+            if self.params["state"] == "present":
+                if self.existing is None:
+                    # Instead of calling self.create(), return an error
+                    self.fail_json(msg="Host does not exist, and creation is not allowed.")
+                elif self.payload_changed():
                     item = self.update()
                     result["changed"] = True
                     result["msg"] = "Host updated"
+
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
                 result["msg"] = "Host unassociated from the server"
+
+        except Exception as e:
+            self.fail_json(msg=f"An error occurred: {str(e)}")
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
