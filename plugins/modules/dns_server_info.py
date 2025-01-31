@@ -62,11 +62,7 @@ EXAMPLES = r"""
     infoblox.bloxone.dns_server_info:
       id: "{{ dns_server_id }}"
 
-<<<<<<< HEAD
-  - name: Get DNS Server information by filters (e.g., name)
-=======
   - name: Get DNS Server information by filters (e.g. name)
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
     infoblox.bloxone.dns_server_info:
       filters:
         name: "example_server"
@@ -167,9 +163,6 @@ objects:
             elements: dict
             contains:
                 algorithm:
-<<<<<<< HEAD
-                    description: ""
-=======
                     description: 
                         - "Specifies the cryptographic algorithm used for DNSSEC. Supported values and their corresponding mappings are as follows."
                         - "RSAMD5 (1)"
@@ -186,7 +179,6 @@ objects:
                         - "RSAMD5 (1)"
                         - "DSA (3)"
                         - "DSANSEC3SHA1 (6)"
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                     type: int
                     returned: Always
                 protocol_zone:
@@ -220,9 +212,6 @@ objects:
             elements: dict
             contains:
                 algorithm:
-<<<<<<< HEAD
-                    description: ""
-=======
                     description: 
                         - "Specifies the cryptographic algorithm used for DNSSEC. Supported values and their corresponding mappings are as follows."
                         - "RSAMD5 (1)"
@@ -239,7 +228,6 @@ objects:
                         - "RSAMD5 (1)"
                         - "DSA (3)"
                         - "DSANSEC3SHA1 (6)"
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                     type: int
                     returned: Always
                 protocol_zone:
@@ -588,9 +576,6 @@ objects:
                                     elements: dict
                                     contains:
                                         algorithm:
-<<<<<<< HEAD
-                                            description: ""
-=======
                                             description: 
                                                 - "Specifies the cryptographic algorithm used for DNSSEC. Supported values and their corresponding mappings are as follows."
                                                 - "RSAMD5 (1)"
@@ -607,7 +592,6 @@ objects:
                                                 - "RSAMD5 (1)"
                                                 - "DSA (3)"
                                                 - "DSANSEC3SHA1 (6)"
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
                                             type: int
                                             returned: Always
                                         protocol_zone:

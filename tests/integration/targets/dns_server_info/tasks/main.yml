@@ -5,7 +5,6 @@
 # - tsig keys
 # - acl
 
-
 - module_defaults:
     group/infoblox.bloxone.all:
       portal_url: "{{ portal_url }}"
@@ -57,17 +56,9 @@
           - dns_server_info.objects | length == 1
           - dns_server_info.objects[0].id == dns_server.id
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
   always:
     - name: "Delete dns server"
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
         state: "absent"
-<<<<<<< HEAD
       ignore_errors: true
-=======
-      ignore_errors: true
->>>>>>> 61784ac16c34d817ebd8c898561241371eb32121
