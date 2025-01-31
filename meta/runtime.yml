@@ -13,6 +13,8 @@ action_groups:
     - dns_auth_zone_info
     - dns_forward_zone
     - dns_forward_zone_info
+    - dns_server
+    - dns_server_info
     - dns_forward_nsg
     - dns_forward_nsg_info
     - dns_auth_nsg
@@ -45,6 +47,10 @@ action_groups:
   infra:
     - infra_join_token
     - infra_join_token_info
+    - infra_host
+    - infra_host_info
+    - infra_service
+    - infra_service_info
 
 plugin_routing:
     modules:
