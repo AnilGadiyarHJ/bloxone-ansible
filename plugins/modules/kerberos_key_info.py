@@ -9,10 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: kerberos_keys_info
-short_description: Manage Kerberos
+module: kerberos_key_info
+short_description: Retrieves Kerberos Keys
 description:
-    - Manage Kerberos
+    - Retrieves information about existing Kerberos Keys.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -57,19 +57,19 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Update Kerberos key with comment
-      infoblox.bloxone.kerberos_keys:
-        id: "{{ kerberos_id }}"
-        comment: "testing comment"
-        state: present
+    - name: Get Kerberos key information by filters (principal)
+      infoblox.bloxone.kerberos_key_info:
+        filters:
+          principal: "{{ principal }}"
 
-    - name: update Kerberos key with tags
-      infoblox.bloxone.kerberos_keys:
-        id: "{{ kerberos_id }}"
-        comment: "testing check mode"
-        tags:
-          location: "tf_acc_test"
-        state: "present"
+    - name: Get Kerberos key information by raw filter query
+      infoblox.bloxone.kerberos_key_info:
+        filter_query: "principal=='{{ principal }}'"
+
+    - name: Get Kerberos key information by tag filters
+      infoblox.bloxone.kerberos_key_info:
+        tag_filters:
+          location: "site-1"
 """
 
 RETURN = r"""
@@ -130,15 +130,15 @@ objects:
 from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
 
 try:
-    from universal_ddi_client import ApiException, NotFoundException
     from keys import KerberosApi
+    from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class KerberosInfoModule(BloxoneAnsibleModule):
+class KerberosKeyInfoModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(KerberosInfoModule, self).__init__(*args, **kwargs)
+        super(KerberosKeyInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
         self._limit = 1000
 
@@ -211,7 +211,7 @@ def main():
         tag_filter_query=dict(type="str", required=False),
     )
 
-    module = KerberosInfoModule(
+    module = KerberosKeyInfoModule(
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=[

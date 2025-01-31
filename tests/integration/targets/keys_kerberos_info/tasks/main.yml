@@ -6,26 +6,42 @@
 
   block:
     - ansible.builtin.set_fact:
-        principal: "DNS/ns.b1ddi.ms47.com"
+        principal: "DNS/ns.b1ddi.neo1.com"
         tag_value: "tf_acc_test"
 
-    - name: Get Kerberos key information by principal
-      infoblox.bloxone.kerberos_keys_info:
+    - name: Get Kerberos key information by Filters (domain)
+      infoblox.bloxone.kerberos_key_info:
+        filters:
+          domain: "NEO1.COM"
+      register: kerberos_info
+    - assert:
+        that:
+          - kerberos_info.objects | length == 5
+          - kerberos_info.objects[0].algorithm is defined
+          - kerberos_info.objects[0].domain is defined
+          - kerberos_info.objects[0].id is defined
+          - kerberos_info.objects[0].principal == "DNS/ns.b1ddi.neo1.com"
+          - kerberos_info.objects[0].uploaded_at is defined
+          - kerberos_info.objects[0].version is defined
+
+    - name: Get Kerberos key information by Filters (principal)
+      infoblox.bloxone.kerberos_key_info:
         filters:
           principal: "{{ principal }}"
       register: kerberos_info
-    - name: update kerboros with tag vaule
-      infoblox.bloxone.kerberos_keys:
-        id: "{{ kerberos_info.objects[0].id }}"
-        comment: "test"
-        tags:
-          location: "{{ tag_value }}"
-        state: present
+    - assert:
+        that:
+          - kerberos_info.objects | length == 5
+          - kerberos_info.objects[0].algorithm is defined
+          - kerberos_info.objects[0].domain is defined
+          - kerberos_info.objects[0].id is defined
+          - kerberos_info.objects[0].principal == "DNS/ns.b1ddi.neo1.com"
+          - kerberos_info.objects[0].uploaded_at is defined
+          - kerberos_info.objects[0].version is defined
 
-    - name: Get Kerberos key information by principal
-      infoblox.bloxone.kerberos_keys_info:
-        filters:
-          principal: "{{ principal }}"
+    - name: Get Kerberos key information by filter query
+      infoblox.bloxone.kerberos_key_info:
+        filter_query: "principal=='{{ principal }}'"
       register: kerberos_info
     - name: Assert Kerberos key properties
       assert:
@@ -34,31 +50,23 @@
           - kerberos_info.objects[0].algorithm is defined
           - kerberos_info.objects[0].domain is defined
           - kerberos_info.objects[0].id is defined
-          - kerberos_info.objects[0].principal == "DNS/ns.b1ddi.ms47.com"
+          - kerberos_info.objects[0].principal == "DNS/ns.b1ddi.neo1.com"
           - kerberos_info.objects[0].uploaded_at is defined
           - kerberos_info.objects[0].version is defined
 
-    - name: Get Kerberos key information by tag filter
-      infoblox.bloxone.kerberos_keys_info:
+    - name: Get Kerberos key information by tag filters
+      infoblox.bloxone.kerberos_key_info:
         tag_filters:
-          location: "{{ tag_value }}"
+          used_for: "{{ tag_value }}"
       register: kerberos_info
     - name: Assert Kerberos key properties
       assert:
         that:
-          - kerberos_info.objects | length == 1
+          - kerberos_info.objects | length == 5
           - kerberos_info.objects[0].algorithm is defined
           - kerberos_info.objects[0].domain is defined
           - kerberos_info.objects[0].id is defined
-          - kerberos_info.objects[0].principal == "DNS/ns.b1ddi.ms47.com"
-          - kerberos_info.objects[0].tags.location == "tf_acc_test"
+          - kerberos_info.objects[0].principal == "DNS/ns.b1ddi.neo1.com"
+          - kerberos_info.objects[0].tags.used_for == "tf_acc_test"
           - kerberos_info.objects[0].uploaded_at is defined
           - kerberos_info.objects[0].id is defined
-
-  always:
-    - name: "Clean up comment and tag"
-      infoblox.bloxone.kerberos_keys:
-        id: "{{ kerberos_info.objects[0].id }}"
-        comment: ""
-        tags: { }
-        state: present
