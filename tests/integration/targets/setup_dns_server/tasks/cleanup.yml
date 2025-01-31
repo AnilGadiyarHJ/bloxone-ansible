@@ -1,0 +1,12 @@
+---
+- module_defaults:
+    group/infoblox.bloxone.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+
+    - name: "Delete Dns Server"
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}"
+        state: "absent"
+      ignore_errors: true

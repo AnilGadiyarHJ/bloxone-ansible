@@ -23,6 +23,8 @@ action_groups:
     - dns_delegation_info
     - dns_record
     - dns_record_info
+    - dns_host
+    - dns_host_info
 
   ipam:
     - ipam_ip_space
