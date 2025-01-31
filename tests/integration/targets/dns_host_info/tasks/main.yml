@@ -13,7 +13,6 @@
         filters:
           display_name: "{{ host_display_name }}"
       register: infra_host_info
-
     - name: Assert Infra Host Exists
       assert:
         that:
@@ -27,6 +26,7 @@
         server: "{{ _dns_server.id }}"
         state: present
       register: dns_host
+
     - name: Get Information about the DNS Host
       infoblox.bloxone.dns_host_info:
         filters:
@@ -48,7 +48,7 @@
 
   always:
     # Cleanup if the test fails
-    - name: "Unassociated DNS Host"
+    - name: "Un associate DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"

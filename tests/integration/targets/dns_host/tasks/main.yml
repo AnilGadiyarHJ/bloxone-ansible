@@ -27,8 +27,7 @@
         filters:
           name: "{{ infra_host_info.objects[0].display_name }}"
       register: dns_host_info
-    - name: Assert DNS Host Creation
-      assert:
+    - assert:
         that:
           - dns_host is changed
           - dns_host.failed == false
@@ -46,8 +45,7 @@
         filters:
           name: "{{ infra_host_info.objects[0].display_name }}"
       register: dns_host_info
-    - name: Assert DNS Host Creation
-      assert:
+    - assert:
         that:
           - dns_host is changed
           - dns_host_info is not failed
@@ -108,8 +106,7 @@
         filters:
           absolute_name: "test_dns_host_name_updated."
       register: dns_host_info
-    - name: Assert DNS Host Exists
-      assert:
+    - assert:
         that:
           - dns_host is changed
           - dns_host_info is not failed
@@ -138,21 +135,20 @@
         filters:
           name: "{{ infra_host_info_2.objects[0].display_name }}"
       register: dns_host_info
-    - name: Assert DNS Host Exists
-      assert:
+    - assert:
         that:
           - dns_host is changed
           - dns_host_info is not failed
           - dns_host_info.objects | length == 1
 
   always:
-    - name: "Unassociate DNS Host"
+    - name: "Un associate DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 
-    - name: "Unassociate DNS Host 2"
+    - name: "Un associate DNS Host 2"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info_2.objects[0].legacy_id }}"
         state: "absent"

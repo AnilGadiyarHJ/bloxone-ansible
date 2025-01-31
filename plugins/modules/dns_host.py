@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_host
-short_description: Manage DNS Host
+short_description: Manage DNS Host in description 
 description:
     - Manage Host
 version_added: 2.0.0
@@ -380,13 +380,6 @@ class HostModule(BloxoneAnsibleModule):
                 self.fail_json(msg=f"Found multiple Host: {resp.results}")
             if len(resp.results) == 0:
                 return None
-
-    def create(self):
-        if self.check_mode:
-            return None
-
-        resp = HostApi(self.client).create(body=self.payload)
-        return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
