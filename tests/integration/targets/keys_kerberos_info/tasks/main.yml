@@ -43,8 +43,7 @@
       infoblox.bloxone.kerberos_key_info:
         filter_query: "principal=='{{ principal }}'"
       register: kerberos_info
-    - name: Assert Kerberos key properties
-      assert:
+    - assert:
         that:
           - kerberos_info.objects | length == 5
           - kerberos_info.objects[0].algorithm is defined
@@ -59,8 +58,7 @@
         tag_filters:
           used_for: "{{ tag_value }}"
       register: kerberos_info
-    - name: Assert Kerberos key properties
-      assert:
+    - assert:
         that:
           - kerberos_info.objects | length == 5
           - kerberos_info.objects[0].algorithm is defined
