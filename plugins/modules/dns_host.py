@@ -14,7 +14,7 @@ short_description: Manages DNS Hosts
 description:
     - Manages DNS Hosts.
     - A DNS Host object associates a DNS Config Profile with an on-prem host.
-    - Note: This resource represents an existing backend object that cannot be created or deleted through API calls. Instead, it can only be updated.
+    - This resource represents an existing backend object that cannot be created or deleted through API calls. Instead, it can only be updated.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -332,9 +332,9 @@ except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class HostModule(BloxoneAnsibleModule):
+class DnsHostModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(HostModule, self).__init__(*args, **kwargs)
+        super(DnsHostModule, self).__init__(*args, **kwargs)
 
         exclude = ["state", "csp_url", "portal_url", "portal_key", "api_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
@@ -408,23 +408,17 @@ class HostModule(BloxoneAnsibleModule):
         try:
             self.existing = self.find()
             item = {}
-
-            if self.params["state"] == "present":
-                if self.existing is None:
-                    # Instead of calling self.create(), return an error
-                    self.fail_json(msg="Host does not exist, and creation is not allowed.")
-                elif self.payload_changed():
+            if self.params["state"] == "present" and self.existing is None:
+                self.fail_json("Host does not exist, and creation is not allowed")
+            elif self.params["state"] == "present" and self.existing is not None:
+                if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
                     result["msg"] = "Host updated"
-
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
                 result["msg"] = "Host unassociated from the server"
-
-        except Exception as e:
-            self.fail_json(msg=f"An error occurred: {str(e)}")
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -474,7 +468,7 @@ def main():
         tags=dict(type="dict"),
     )
 
-    module = HostModule(
+    module = DnsHostModule(
         argument_spec=module_args,
         supports_check_mode=True,
         required_if=[("state", "present", ["id", "server"])],

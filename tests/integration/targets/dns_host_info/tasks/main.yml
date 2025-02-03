@@ -19,7 +19,7 @@
           - infra_host_info is not failed
           - infra_host_info.objects | length == 1
 
-    - name: Create DNS Host Creation
+    - name: update DNS Host
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "{{ absolute_name }}"
@@ -35,7 +35,7 @@
     - assert:
         that:
           - dns_host_info.objects | length == 1
-          - dns_host_info.objects[0].absolute_name == dns_host.object.absolute_name
+          - dns_host_info.objects[0].absolute_name == absolute_name
 
     - name: Get DNS host information by filter query
       infoblox.bloxone.dns_host_info:

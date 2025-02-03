@@ -19,7 +19,7 @@
           - infra_host_info is not failed
           - infra_host_info.objects | length > 0
 
-    - name: Update DNS Host Creation (check mode)
+    - name: Update DNS Host (check mode)
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         server: "{{ _dns_server.id }}"
@@ -35,6 +35,7 @@
         that:
           - dns_host is changed
           - dns_host.failed == false
+          # Dns host returns na object cause the object already exists
           - dns_host_info.objects | length == 1
 
     - name: Update DNS Host
@@ -53,7 +54,7 @@
         that:
           - dns_host is changed
           - dns_host_info is not failed
-          - dns_host_info.objects | length == 1 # Dns host returns a object cause the object already exists
+          - dns_host_info.objects | length == 1
 
     - name: Update DNS Host (idempotent)
       infoblox.bloxone.dns_host:
@@ -67,7 +68,7 @@
           - dns_host is not changed
           - dns_host is not failed
 
-    - name: Unassociate DNS host from the server (Check Mode)
+    - name: Dissociate DNS host from the server (Check Mode)
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: absent
@@ -83,7 +84,7 @@
           - dns_host is changed
           - dns_host_info is not failed
 
-    - name: Delete the DNS Host
+    - name: Dissociate DNS host from the server
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: absent
@@ -100,7 +101,7 @@
 
     - name: Update absolute name for DNS Host
       infoblox.bloxone.dns_host:
-       absolute_name: "test_dns_host_name_updated."
+       absolute_name: "{{ absolute_name }}_updated"
        id: "{{ infra_host_info.objects[0].legacy_id }}"
        server: "{{ _dns_server.id }}"
        state: present
@@ -108,15 +109,16 @@
     - name: Get DNS Host Information
       infoblox.bloxone.dns_host_info:
         filters:
-          absolute_name: "test_dns_host_name_updated."
+          absolute_name: "{{ absolute_name }}_updated."
       register: dns_host_info
     - assert:
         that:
           - dns_host is changed
           - dns_host_info is not failed
           - dns_host_info.objects | length == 1
+          - dns_host_info.objects[0].absolute_name == "{{ absolute_name }}_updated."
 
-    - name: Create a DNS Server 2
+    - name: Update a DNS Server 2
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}_new"
         state: present
@@ -146,13 +148,13 @@
           - dns_host_info.objects | length == 1
 
   always:
-    - name: "Un associate DNS Host"
+    - name: "Dissociate DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 
-    - name: "Un associate DNS Host 2"
+    - name: "Dissociate DNS Host 2"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info_2.objects[0].legacy_id }}"
         state: "absent"
@@ -162,7 +164,7 @@
         name: "setup_dns_server"
         tasks_from: cleanup.yml
 
-    - name: "Delete Dns Server2"
+    - name: "Delete DNS Server2"
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}_new"
         state: "absent"

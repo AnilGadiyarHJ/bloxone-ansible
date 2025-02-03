@@ -12,7 +12,8 @@ DOCUMENTATION = r"""
 module: dns_host_info
 short_description: Retrieve DNS Host
 description:
-    - Retrieve DNS Host 
+    - Retrieves information about existing DNS Hosts
+    - A DNS Host object associates DNS configuration with hosts.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -57,18 +58,11 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create DNS Host Creation
-      infoblox.bloxone.dns_host:
-        id: "{{ infra_host.id }}"
-        absolute_name: "example_server_name"
-        server: "{{ server.id }}"
-        state: present
-
     - name: Get DNS Host information by ID
       infoblox.bloxone.dns_host_info:
         id: "{{ dns_host_id }}"
 
-    - name: Get DNS Host information by filters (e.g., absolute_name)
+    - name: Get DNS Host information by filters (e.g. absolute_name)
       infoblox.bloxone.dns_host_info:
         filters:
           absolute_name: "example_host"
@@ -308,9 +302,9 @@ except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
 
-class HostInfoModule(BloxoneAnsibleModule):
+class DnsHostInfoModule(BloxoneAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(HostInfoModule, self).__init__(*args, **kwargs)
+        super(DnsHostInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
         self._limit = 1000
 
@@ -383,7 +377,7 @@ def main():
         tag_filter_query=dict(type="str", required=False),
     )
 
-    module = HostInfoModule(
+    module = DnsHostInfoModule(
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=[
