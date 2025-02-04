@@ -12,3 +12,9 @@
         name: "{{ dns_server_name }}"
         state: present
       register: _dns_server
+
+    - name: Create a DNS Server 2
+      infoblox.bloxone.dns_server:
+          name: "{{ dns_server_name }}-2"
+          state: present
+      register: _dns_server_2

@@ -5,8 +5,14 @@
       portal_key: "{{ portal_key }}"
   block:
 
-    - name: "Delete Dns Server"
+    - name: "Delete DNS Server"
       infoblox.bloxone.dns_server:
         name: "{{ dns_server_name }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete DNS Server"
+      infoblox.bloxone.dns_server:
+        name: "{{ dns_server_name }}-2"
         state: "absent"
       ignore_errors: true

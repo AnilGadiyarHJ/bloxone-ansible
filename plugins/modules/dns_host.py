@@ -97,6 +97,11 @@ EXAMPLES = r"""
         server: "{{ server.id }}"
         state: present
 
+    - name: "Dissociate DNS Host"
+      infoblox.bloxone.dns_host:
+        id: "{{ infra_host_info.legacy_id }}"
+        state: "absent"
+
     - name: Delete the DNS Server
       infoblox.bloxone.dns_server:
         name: "example_server_name"

@@ -48,12 +48,13 @@
 
   always:
     # Cleanup if the test fails
-    - name: "Un associate DNS Host"
+    - name: "Dissociate DNS Host"
       infoblox.bloxone.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 
-    - ansible.builtin.include_role:
+    - name: "Cleanup DNS Host"
+      ansible.builtin.include_role:
         name: "setup_dns_server"
         tasks_from: cleanup.yml
