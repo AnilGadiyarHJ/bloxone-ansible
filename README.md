@@ -1,12 +1,12 @@
 # Infoblox BloxOne Collection for Ansible
 
-The Infoblox BloxOne Collection (`infoblox.bloxone`) includes a variety of Ansible modules to help automate the management of BloxOne services. 
+The Infoblox BloxOne Collection (`infoblox.universal_ddi`) includes a variety of Ansible modules to help automate the management of BloxOne services. 
 
 ## Version Information
 
 ### What's new in v2
-- The collection has been renamed from `b1ddi_modules` to `bloxone`.
-- The modules are renamed to follow the BloxOne API naming conventions. The old module names are deprecated and will be removed in the next major release.
+- The collection has been renamed from `b1ddi_modules` to `universal_ddi`.
+- The modules are renamed to follow the Universal DDI API naming conventions. The old module names are deprecated and will be removed in the next major release.
 - The modules are rewritten to use the [Universal DDI Python client](https://github.com/infobloxopen/universal-ddi-python-client) library. This provides a more consistent experience across the modules and supports a wider range of BloxOne services.
 
 ## Requirements
@@ -18,7 +18,7 @@ The Infoblox BloxOne Collection (`infoblox.bloxone`) includes a variety of Ansib
 
 ## Installation
 
-The `infoblox.bloxone` collection can be installed from git repository.
+The `infoblox.universal_ddi` collection can be installed from git repository.
 
 ```shell
 ansible-galaxy collection install git+https://github.com/infobloxopen/bloxone-ansible.git,v2
