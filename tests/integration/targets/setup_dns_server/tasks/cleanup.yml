@@ -1,18 +1,18 @@
 ---
 - module_defaults:
-    group/infoblox.bloxone.all:
+    group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
 
     - name: "Delete DNS Server"
-      infoblox.bloxone.dns_server:
+      infoblox.universal_ddi.dns_server:
         name: "{{ dns_server_name }}"
         state: "absent"
       ignore_errors: true
 
     - name: "Delete DNS Server"
-      infoblox.bloxone.dns_server:
+      infoblox.universal_ddi.dns_server:
         name: "{{ dns_server_name }}-2"
         state: "absent"
       ignore_errors: true

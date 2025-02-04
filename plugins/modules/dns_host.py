@@ -76,34 +76,34 @@ options:
         type: dict
 
 extends_documentation_fragment:
-    - infoblox.bloxone.common
+    - infoblox.universal_ddi.common
 """  # noqa: E501
 
 EXAMPLES = r"""
     - name: Retrieve Infra Host Information (required as parent)
-      infoblox.bloxone.infra_host_info:
+      infoblox.universal_ddi.infra_host_info:
         filters:
           display_name: "test_infra_host"
 
     - name: Create a DNS Server (required as parent)
-      infoblox.bloxone.dns_server:
+      infoblox.universal_ddi.dns_server:
         name: "example_server"
         state: present
 
     - name: Update DNS Host
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ infra_host.id }}"
         absolute_name: "example_server_name"
         server: "{{ server.id }}"
         state: present
 
     - name: "Dissociate DNS Host"
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ infra_host_info.legacy_id }}"
         state: "absent"
 
     - name: Delete the DNS Server
-      infoblox.bloxone.dns_server:
+      infoblox.universal_ddi.dns_server:
         name: "example_server_name"
         state: "absent"
 """
@@ -328,7 +328,7 @@ item:
             returned: Always
 """  # noqa: E501
 
-from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import UniversalDDIAnsibleModule
+from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
     from dns_config import Host, HostApi

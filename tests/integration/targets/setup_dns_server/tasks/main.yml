@@ -1,6 +1,6 @@
 ---
 - module_defaults:
-    group/infoblox.bloxone.all:
+    group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
@@ -8,13 +8,13 @@
         dns_server_name: "dns-server-{{ 999999 | random | string }}"
 
     - name: Create a DNS Server
-      infoblox.bloxone.dns_server:
+      infoblox.universal_ddi.dns_server:
         name: "{{ dns_server_name }}"
         state: present
       register: _dns_server
 
     - name: Create a DNS Server 2
-      infoblox.bloxone.dns_server:
+      infoblox.universal_ddi.dns_server:
           name: "{{ dns_server_name }}-2"
           state: present
       register: _dns_server_2

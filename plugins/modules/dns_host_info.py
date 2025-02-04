@@ -54,21 +54,21 @@ options:
         required: false
 
 extends_documentation_fragment:
-    - infoblox.bloxone.common
+    - infoblox.universal_ddi.common
 """  # noqa: E501
 
 EXAMPLES = r"""
     - name: Get DNS Host information by ID
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         id: "{{ dns_host_id }}"
 
     - name: Get DNS Host information by filters (e.g. absolute_name)
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           absolute_name: "example_host"
 
     - name: Get DNS Host information by raw filter query
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filter_query: "absolute_name=='example_host'"
 """
 
@@ -293,7 +293,7 @@ objects:
             returned: Always
 """  # noqa: E501
 
-from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import UniversalDDIAnsibleModule
+from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
     from dns_config import HostApi
