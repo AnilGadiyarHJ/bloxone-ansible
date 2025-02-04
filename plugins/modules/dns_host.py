@@ -328,16 +328,16 @@ item:
             returned: Always
 """  # noqa: E501
 
-from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import BloxoneAnsibleModule
+from ansible_collections.infoblox.bloxone.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
     from dns_config import Host, HostApi
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
-    pass  # Handled by BloxoneAnsibleModule
+    pass  # Handled by UniversalDDIAnsibleModule
 
 
-class DnsHostModule(BloxoneAnsibleModule):
+class DnsHostModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
         super(DnsHostModule, self).__init__(*args, **kwargs)
 

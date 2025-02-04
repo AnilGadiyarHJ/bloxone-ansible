@@ -1,6 +1,6 @@
 ---
 - module_defaults:
-    group/infoblox.bloxone.all:
+    group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
@@ -9,7 +9,7 @@
         absolute_name: "test_dns_host_name-{{ 999999 | random | string }}."
 
     - name: Get Infra Host Information
-      infoblox.bloxone.infra_host_info:
+      infoblox.universal_ddi.infra_host_info:
         filters:
           display_name: "{{ host_display_name }}"
       register: infra_host_info
@@ -20,7 +20,7 @@
           - infra_host_info.objects | length == 1
 
     - name: update DNS Host
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "{{ absolute_name }}"
         server: "{{ _dns_server.id }}"
@@ -28,7 +28,7 @@
       register: dns_host
 
     - name: Get Information about the DNS Host
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           absolute_name: "{{ absolute_name }}"
       register: dns_host_info
@@ -38,7 +38,7 @@
           - dns_host_info.objects[0].absolute_name == absolute_name
 
     - name: Get DNS host information by filter query
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filter_query: "absolute_name=='{{ absolute_name }}'"
       register: dns_host_info
     - assert:
@@ -49,7 +49,7 @@
   always:
     # Cleanup if the test fails
     - name: "Dissociate DNS Host"
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true

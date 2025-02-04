@@ -1,6 +1,6 @@
 ---
 - module_defaults:
-    group/infoblox.bloxone.all:
+    group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
@@ -10,14 +10,14 @@
         host_display_name2: "TF_TEST_HOST_02"
 
     - name: Update DNS Host (check mode)
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
         server: "{{ _dns_server.id }}"
         state: present
       check_mode: true
       register: dns_host
     - name: Get DNS Host Information
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           name: "{{ _infra_host_info_1.objects[0].display_name }}"
       register: dns_host_info
@@ -29,13 +29,13 @@
           - dns_host_info.objects | length == 1
 
     - name: Update DNS Host
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
         server: "{{ _dns_server.id }}"
         state: present
       register: dns_host
     - name: Get DNS Host Information
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           name: "{{ _infra_host_info_1.objects[0].display_name }}"
       register: dns_host_info
@@ -46,7 +46,7 @@
           - dns_host_info.objects | length == 1
 
     - name: Update DNS Host (idempotent)
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
         server: "{{ _dns_server.id }}"
         state: present
@@ -57,13 +57,13 @@
           - dns_host is not failed
 
     - name: Dissociate DNS host from the server (Check Mode)
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
         state: absent
       check_mode: true
       register: dns_host
     - name: Get DNS Host Information
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           name: "{{ _infra_host_info_1.objects[0].display_name }}"
       register: dns_host_info
@@ -73,12 +73,12 @@
           - dns_host_info is not failed
 
     - name: Dissociate DNS host from the server
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
         state: absent
       register: dns_host
     - name: Get DNS Host Information
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           name: "{{ _infra_host_info_1.objects[0].display_name }}"
       register: dns_host_info
@@ -88,14 +88,14 @@
           - dns_host_info is not failed
 
     - name: Update absolute name for DNS Host
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
        absolute_name: "{{ absolute_name }}_updated"
        id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
        server: "{{ _dns_server.id }}"
        state: present
       register: dns_host
     - name: Get DNS Host Information
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           absolute_name: "{{ absolute_name }}_updated."
       register: dns_host_info
@@ -107,14 +107,14 @@
           - dns_host_info.objects[0].absolute_name == "{{ absolute_name }}_updated."
 
     - name: Update server for DNS Host
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
        absolute_name: "{{ absolute_name }}"
        id: "{{ _infra_host_info_2.objects[0].legacy_id }}"
        server: "{{ _dns_server_2.id }}"
        state: present
       register: dns_host
     - name: Get DNS Host Information
-      infoblox.bloxone.dns_host_info:
+      infoblox.universal_ddi.dns_host_info:
         filters:
           name: "{{ _infra_host_info_2.objects[0].display_name }}"
       register: dns_host_info
@@ -126,13 +126,13 @@
 
   always:
     - name: "Dissociate DNS Host"
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_1.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 
     - name: "Dissociate DNS Host 2"
-      infoblox.bloxone.dns_host:
+      infoblox.universal_ddi.dns_host:
         id: "{{ _infra_host_info_2.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
