@@ -381,7 +381,7 @@ class DnsHostModule(UniversalDDIAnsibleModule):
                 if self.params["state"] == "absent":
                     return None
                 raise
-        # If no ID is provided, return None
+
         return None
 
     def update(self):
