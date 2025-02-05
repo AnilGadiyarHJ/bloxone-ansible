@@ -373,7 +373,7 @@ class DnsHostModule(UniversalDDIAnsibleModule):
         if self.params["id"] is not None:
             try:
                 # Attempt to read the host using the provided ID,If the ID is not found
-                # and the state is "absent", return None, If the state is not "absent", raise the exception
+                # and the state is "absent", return None, If the state is not "absent", raise the exception.
                 resp = HostApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException:
