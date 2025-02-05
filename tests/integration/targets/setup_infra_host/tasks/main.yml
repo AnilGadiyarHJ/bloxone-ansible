@@ -15,15 +15,3 @@
         serial_number: "{{ serial_number }}"
         state: present
       register: _infra_host
-
-    - name: Get Host Information
-      infoblox.universal_ddi.infra_host_info:
-        filters:
-          display_name: "TF_TEST_HOST_01"
-      register: _infra_host_info_1
-
-    - name: Get Host Information
-      infoblox.universal_ddi.infra_host_info:
-        filters:
-          display_name: "TF_TEST_HOST_02"
-      register: _infra_host_info_2
